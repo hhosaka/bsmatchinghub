@@ -25,6 +25,7 @@
         <?php
             echo $this->Form->control('username');
             echo $this->Form->control('password');
+            echo $this->Form->control('handlename');
             echo $this->Form->control('role');
             echo $this->Form->control('status');
             echo $this->Form->control('start_time');
