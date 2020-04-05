@@ -11,7 +11,7 @@
         <?= $this->Form->control('username',['label'=>'ユーザー名(メールアドレス)を入力してください']) ?>
         <?= $this->Form->control('password',['label'=>'パスワードを入力してください']) ?>
     </fieldset>
-    <li><?= $this->Html->link('新規登録の方はこちら', ['controller' => 'Users', 'action' => 'firstEntry','redirectUrl'=>$redirectUrl])  ?></li>
+    <li><?= $this->Html->link('新規登録の方はこちら', ['controller' => 'Users', 'action' => 'entry','redirectUrl'=>$redirectUrl])  ?></li>
     <?= $this->Form->button(__('Login')); ?>
     <?= $this->Form->end() ?>
 </div>

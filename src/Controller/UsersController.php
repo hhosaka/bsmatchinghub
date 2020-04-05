@@ -67,6 +67,30 @@ class UsersController extends AppController
         return $this->redirect($this->Auth->logout());
     }
 
+    public function entry(){
+        $user = $this->Users->newEntity();
+        $redirectUrl = $this->request->getQuery('redirectUrl');
+        echo $redirectUrl;
+        if ($this->request->is('post')) {
+            $user = $this->Users->patchEntity($user, $this->request->getData());
+            $user['status'] = 'READY';
+            $user['role'] = 'guest';
+            try{
+                if ($this->Users->saveOrFail($user)) {
+                    $this->Flash->success(__('登録完了しました。'));
+                    $this->Auth->setUser($user);
+                    
+                    return $this->redirect($redirectUrl);
+                }
+            }catch(\Cake\ORM\Exception\PersistenceFailedException $e){
+                echo $e;
+            }
+
+            $this->Flash->error(__('登録できませんでした。'));
+        }
+        $this->set(compact('user'));
+    }
+
     /**
      * Index method
      *

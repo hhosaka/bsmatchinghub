@@ -50,10 +50,6 @@ class UsersTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->integer('id')
-            ->allowEmptyString('id', null, 'create');
-
-        $validator
             ->scalar('username')
             ->maxLength('username', 128)
             ->requirePresence('username', 'create')
@@ -84,16 +80,10 @@ class UsersTable extends Table
             ->notEmptyString('status');
 
         $validator
-            ->dateTime('start_time')
-            ->notEmptyDateTime('start_time');
+            ->dateTime('start_time');
 
         $validator
-            ->dateTime('end_time')
-            ->notEmptyDateTime('end_time');
-
-        $validator
-            ->scalar('list_mode')
-            ->notEmptyString('list_mode');
+            ->dateTime('end_time');
 
         $validator
             ->scalar('skype_account')
@@ -118,92 +108,58 @@ class UsersTable extends Table
             ->notEmptyString('comment');
 
         $validator
-            ->boolean('keyword00')
-            ->requirePresence('keyword00', 'create')
-            ->notEmptyString('keyword00');
+            ->boolean('keyword00');
 
         $validator
-            ->boolean('keyword01')
-            ->requirePresence('keyword01', 'create')
-            ->notEmptyString('keyword01');
+            ->boolean('keyword01');
 
         $validator
-            ->boolean('keyword02')
-            ->requirePresence('keyword02', 'create')
-            ->notEmptyString('keyword02');
+            ->boolean('keyword02');
 
         $validator
-            ->boolean('keyword03')
-            ->requirePresence('keyword03', 'create')
-            ->notEmptyString('keyword03');
+            ->boolean('keyword03');
 
         $validator
-            ->boolean('keyword04')
-            ->requirePresence('keyword04', 'create')
-            ->notEmptyString('keyword04');
+            ->boolean('keyword04');
 
         $validator
-            ->boolean('keyword05')
-            ->requirePresence('keyword05', 'create')
-            ->notEmptyString('keyword05');
+            ->boolean('keyword05');
 
         $validator
-            ->boolean('keyword06')
-            ->requirePresence('keyword06', 'create')
-            ->notEmptyString('keyword06');
+            ->boolean('keyword06');
 
         $validator
-            ->boolean('keyword07')
-            ->requirePresence('keyword07', 'create')
-            ->notEmptyString('keyword07');
+            ->boolean('keyword07');
 
         $validator
-            ->boolean('keyword08')
-            ->requirePresence('keyword08', 'create')
-            ->notEmptyString('keyword08');
+            ->boolean('keyword08');
 
         $validator
-            ->boolean('keyword09')
-            ->requirePresence('keyword09', 'create')
-            ->notEmptyString('keyword09');
+            ->boolean('keyword09');
 
         $validator
-            ->boolean('keyword10')
-            ->requirePresence('keyword10', 'create')
-            ->notEmptyString('keyword10');
+            ->boolean('keyword10');
 
         $validator
-            ->boolean('keyword11')
-            ->requirePresence('keyword11', 'create')
-            ->notEmptyString('keyword11');
+            ->boolean('keyword11');
 
         $validator
-            ->boolean('keyword12')
-            ->requirePresence('keyword12', 'create')
-            ->notEmptyString('keyword12');
+            ->boolean('keyword12');
 
         $validator
-            ->boolean('keyword13')
-            ->requirePresence('keyword13', 'create')
-            ->notEmptyString('keyword13');
+            ->boolean('keyword13');
 
         $validator
-            ->boolean('keyword14')
-            ->requirePresence('keyword14', 'create')
-            ->notEmptyString('keyword14');
+            ->boolean('keyword14');
 
         $validator
-            ->boolean('keyword15')
-            ->requirePresence('keyword15', 'create')
-            ->notEmptyString('keyword15');
+            ->boolean('keyword15');
 
         $validator
-            ->dateTime('creation_date')
-            ->notEmptyDateTime('creation_date');
+            ->dateTime('creation_date');
 
         $validator
-            ->dateTime('modification_date')
-            ->notEmptyDateTime('modification_date');
+            ->dateTime('modification_date');
 
         return $validator;
     }

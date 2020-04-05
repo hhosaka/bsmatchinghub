@@ -7,6 +7,8 @@ use Cake\Error\ExceptionRenderer;
 use Cake\Log\Engine\FileLog;
 use Cake\Mailer\Transport\MailTransport;
 
+const TITLE_FLAG1 = "CSレベル対戦";
+
 return [
     /**
      * Debug Level:
