@@ -99,6 +99,13 @@ class UsersController extends AppController
         $this->set(compact('users'));
     }
 
+    public function admin()
+    {
+        $users = $this->paginate($this->Users);
+
+        $this->set(compact('users'));
+    }
+
     /**
      * View method
      *
@@ -117,7 +124,7 @@ class UsersController extends AppController
 
     public function viewUser()
     {
-        $this->set('user', $this->Auth->user());
+        $this->view($this->Auth->user()['id']);
     }
 
     /**
