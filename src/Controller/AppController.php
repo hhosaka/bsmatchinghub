@@ -55,6 +55,7 @@ class AppController extends Controller
                     ]
                 ]
             ],
+            'authorize' => ['Controller'],
             'loginRedirect' => [
                 'controller' => 'Users',
                 'action' => 'index'
@@ -63,7 +64,7 @@ class AppController extends Controller
                 'controller' => 'Users',
                 'action' => 'index',
             ],
-            'authError' => 'ログインされていません。ログインしてください。(ERROR001)'
+            'authError' => 'ログインされていないか、権限がありません。ログインしてください。(ERROR001)'
         ]);
         // $this->viewBuilder()->setLayout('original');
 
@@ -74,9 +75,15 @@ class AppController extends Controller
         //$this->loadComponent('Security');
     }
 
+    public function beforeFilter(Event $event)
+    {
+        parent::beforeFilter($event);
+        $this->Auth->allow(['entry', 'logout']);
+    }
+
     public function isAuthorized($user = null)
     {
-        if($user='admin' || $user='staff'){
+        if($user='admin'){
             return true;
         }
         return false;

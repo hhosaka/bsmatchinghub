@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Event\Event;
 
 /**
  * Users Controller
@@ -24,25 +25,17 @@ class UsersController extends AppController
             'rule' => ['compareWith', 'email1'],
             'message' => '確認用のメールアドレスが一致しません',
         ]);
-        $this->Auth->allow(['login','entry']);
     }
 
-    // public function isAuthorized($user = null)
-    // {
-    //     $action = $this->request->params['action'];
-
-    //     if(in_array($user,['member','guest'])
-    //         && in_array($action,['controlPanel','editSelf','changePassword'])){
-    //         return true;
-    //     }
-    //     return parent::isAuthorized();
-    // }
-
-    // public function beforeFilter(Event $event)
-    // {
-    //     parent::beforeFilter($event);
-    //     $this->Auth->allow(['login','firstEntry']);
-    // }
+    public function isAuthorized($user = null)
+    {
+        $action = $this->request->params['action'];
+        echo 'isAuthorized';
+        if(in_array($action,['index','editUser','viewUSer'])){
+            return true;
+        }
+        return parent::isAuthorized();
+    }
 
     public function login()
     {
@@ -75,15 +68,11 @@ class UsersController extends AppController
             $user = $this->Users->patchEntity($user, $this->request->getData());
             $user['status'] = 'READY';
             $user['role'] = 'guest';
-            try{
-                if ($this->Users->saveOrFail($user)) {
-                    $this->Flash->success(__('登録完了しました。'));
-                    $this->Auth->setUser($user);
-                    
-                    return $this->redirect($redirectUrl);
-                }
-            }catch(\Cake\ORM\Exception\PersistenceFailedException $e){
-                echo $e;
+            if ($this->Users->saveOrFail($user)) {
+                $this->Flash->success(__('登録完了しました。'));
+                $this->Auth->setUser($user);
+                
+                return $this->redirect($redirectUrl);
             }
 
             $this->Flash->error(__('登録できませんでした。'));

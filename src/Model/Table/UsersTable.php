@@ -103,9 +103,7 @@ class UsersTable extends Table
 
         $validator
             ->scalar('comment')
-            ->maxLength('comment', 1024)
-            ->requirePresence('comment', 'create')
-            ->notEmptyString('comment');
+            ->maxLength('comment', 1024);
 
         $validator
             ->boolean('keyword00');
