@@ -32,24 +32,19 @@
             <td><?= h($user->twitter_handle_name) ?></td>
         </tr>
         <tr>
-            <th scope="row"><?= __('Comment') ?></th>
+            <th scope="row"><?= __('コメント') ?></th>
             <td><?= h($user->comment) ?></td>
         </tr>
         <tr>
-            <th scope="row"><?= __('Start Time') ?></th>
+            <th scope="row"><?= __('開始時間（開始予定時間）') ?></th>
             <td><?= h($user->start_time) ?></td>
         </tr>
         <tr>
-            <th scope="row"><?= __('End Time') ?></th>
+            <th scope="row"><?= __('終了予定時間') ?></th>
             <td><?= h($user->end_time) ?></td>
         </tr>
         <tr>
-            <th scope="row"><?= __('Creation Date') ?></th>
-            <td><?= h($user->creation_date) ?></td>
-        </tr>
-        <tr>
-            <th scope="row"><?= __('Modification Date') ?></th>
-            <td><?= h($user->modification_date) ?></td>
+            <th scope="row"><?= __('どんな対戦を希望しているか（対戦レベル）') ?></th>
         </tr>
         <tr>
             <th scope="row"><?= __('競技志向') ?></th>
@@ -68,6 +63,9 @@
             <td><?= $user->keyword03 ? __('Yes') : __('No'); ?></td>
         </tr>
         <tr>
+            <th scope="row"><?= __('どんな対戦を希望しているか（時間）') ?></th>
+        </tr>
+        <tr>
             <th scope="row"><?= __('連戦') ?></th>
             <td><?= $user->keyword06 ? __('Yes') : __('No'); ?></td>
         </tr>
@@ -75,9 +73,17 @@
             <th scope="row"><?= __('一本勝負') ?></th>
             <td><?= $user->keyword07 ? __('Yes') : __('No'); ?></td>
         </tr>
+        <tr>
+            <th scope="row"><?= __('登録日時') ?></th>
+            <td><?= h($user->creation_date) ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?= __('更新日時') ?></th>
+            <td><?= h($user->modification_date) ?></td>
+        </tr>
     </table>
     <div class="related">
-        <h4><?= __('Related Blacks') ?></h4>
+        <h4><?= __('ブラックリスト') ?></h4>
         <?php if (!empty($user->blacks)): ?>
         <table cellpadding="0" cellspacing="0">
             <tr>

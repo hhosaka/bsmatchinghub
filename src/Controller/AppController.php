@@ -83,7 +83,7 @@ class AppController extends Controller
 
     public function isAuthorized($user = null)
     {
-        if($user='admin'){
+        if($user['role']=='admin'){
             return true;
         }
         return false;

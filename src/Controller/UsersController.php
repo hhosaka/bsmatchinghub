@@ -30,11 +30,10 @@ class UsersController extends AppController
     public function isAuthorized($user = null)
     {
         $action = $this->request->params['action'];
-        echo 'isAuthorized';
-        if(in_array($action,['index','editUser','viewUSer'])){
+        if(in_array($action,['index','editUser','viewUser'])){
             return true;
         }
-        return parent::isAuthorized();
+        return parent::isAuthorized($user);
     }
 
     public function login()
@@ -87,7 +86,15 @@ class UsersController extends AppController
      */
     public function index()
     {
-        $users = $this->paginate($this->Users);
+        $this->set('entity',$this->Users->newEntity());
+        if($this->request->is('post')){
+            $query = $this->Users->find('all',['conditions'=>['and'=>['keyword00'=>'1','keyword02'=>'1']]]);
+        }
+        else{
+            $query = $this->Users;
+        }
+
+        $users = $this->paginate($query);
 
         $this->set(compact('users'));
     }
@@ -106,6 +113,11 @@ class UsersController extends AppController
         ]);
 
         $this->set('user', $user);
+    }
+
+    public function viewUser()
+    {
+        $this->set('user', $this->Auth->user());
     }
 
     /**
@@ -152,6 +164,11 @@ class UsersController extends AppController
         $this->set(compact('user'));
     }
 
+    public function editUser()
+    {
+        $this->edit($this->Auth->user()['id']);
+    }
+
     /**
      * Delete method
      *
@@ -161,14 +178,18 @@ class UsersController extends AppController
      */
     public function delete($id = null)
     {
-        $this->request->allowMethod(['post', 'delete']);
-        $user = $this->Users->get($id);
-        if ($this->Users->delete($user)) {
-            $this->Flash->success(__('The user has been deleted.'));
-        } else {
-            $this->Flash->error(__('The user could not be deleted. Please, try again.'));
+        $user = $this->Auth->user();
+        if($user['role']=='admin'){
+            $this->request->allowMethod(['post', 'delete']);
+            $user = $this->Users->get($id);
+            if ($this->Users->delete($user)) {
+                $this->Flash->success(__('The user has been deleted.'));
+            } else {
+                $this->Flash->error(__('The user could not be deleted. Please, try again.'));
+            }
+        }else{
+            $this->Flash->error(__('This action is not allowed.'));
         }
-
         return $this->redirect(['action' => 'index']);
     }
 }
