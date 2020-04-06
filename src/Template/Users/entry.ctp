@@ -16,6 +16,8 @@
             echo $this->Form->control('twitter_account',['label'=>'Twitter ID']);
             echo $this->Form->control('twitter_handle_name',['label'=>'Twitterハンドル名']);
             echo $this->Form->control('comment',['label'=>'コメント']);
+            echo $this->Html->link('利用規約', ['action' => 'tos']);
+            echo $this->Form->control('accept',['require'=>true, 'type'=>'checkbox', 'label'=>'利用規約に同意します。']);
         ?>
     </fieldset>
     <?= $this->Form->button(__('Submit')) ?>

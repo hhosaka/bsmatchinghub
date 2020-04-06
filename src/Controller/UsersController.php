@@ -27,6 +27,12 @@ class UsersController extends AppController
         ]);
     }
 
+    public function beforeFilter(Event $event)
+    {
+        parent::beforeFilter($event);
+        $this->Auth->allow(['entry', 'tos', 'logout']);
+    }
+
     public function isAuthorized($user = null)
     {
         $action = $this->request->params['action'];
@@ -64,19 +70,30 @@ class UsersController extends AppController
         $redirectUrl = $this->request->getQuery('redirectUrl');
         echo $redirectUrl;
         if ($this->request->is('post')) {
-            $user = $this->Users->patchEntity($user, $this->request->getData());
-            $user['status'] = 'READY';
-            $user['role'] = 'guest';
-            if ($this->Users->saveOrFail($user)) {
-                $this->Flash->success(__('登録完了しました。'));
-                $this->Auth->setUser($user);
-                
-                return $this->redirect($redirectUrl);
+            if($this->request->data['accept']){
+                $user = $this->Users->patchEntity($user, $this->request->getData());
+                $user['role'] = 'guest';
+                if ($this->Users->saveOrFail($user)) {
+                    $this->Flash->success(__('登録完了しました。'));
+                    $this->Auth->setUser($user);
+                    
+                    return $this->redirect($redirectUrl);
+                }
+            }else{
+                $this->Flash->error(__('登録の為には利用規約への同意が必要です。'));
             }
 
             $this->Flash->error(__('登録できませんでした。'));
         }
         $this->set(compact('user'));
+    }
+
+    public function getStatus($user){
+        return $user['status'];
+    }
+
+    public function tos(){
+
     }
 
     /**
@@ -86,17 +103,25 @@ class UsersController extends AppController
      */
     public function index()
     {
-        $this->set('entity',$this->Users->newEntity());
-        if($this->request->is('post')){
-            $query = $this->Users->find('all',['conditions'=>['and'=>['keyword00'=>'1','keyword02'=>'1']]]);
-        }
-        else{
-            $query = $this->Users;
-        }
+        $user = $this->Users->findById($this->Auth->user()['id'])->first();
+        $conds[]=['status'=>'active'];
+        if($this->request->is('post'))
+            $data = $this->request->data;
+        else
+            $data = $user;
+
+        if($data['keyword00']) $conds[]=['keyword00'=>'1'];
+        if($data['keyword01']) $conds[]=['keyword01'=>'1'];
+        if($data['keyword02']) $conds[]=['keyword02'=>'1'];
+        if($data['keyword03']) $conds[]=['keyword03'=>'1'];
+        if($data['keyword06']) $conds[]=['keyword06'=>'1'];
+        if($data['keyword07']) $conds[]=['keyword07'=>'1'];
+
+        $query = $this->Users->find('all',['conditions'=>['and'=>[$conds]]]);
 
         $users = $this->paginate($query);
 
-        $this->set(compact('users'));
+        $this->set(compact('user', 'users'));
     }
 
     public function admin()

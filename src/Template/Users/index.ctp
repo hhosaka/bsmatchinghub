@@ -17,12 +17,12 @@
     <h3><?= __('条件設定') ?></h3>
     <?=$this->Form->create() ?>
     <fieldset>
-        <?=$this->Form->control("keyword00",['type'=>'checkbox','label'=>'競技志向']) ?>
-        <?=$this->Form->control("keyword01",['type'=>'checkbox','label'=>'ショップ大会']) ?>
-        <?=$this->Form->control("keyword02",['type'=>'checkbox','label'=>'フリー対戦']) ?>
-        <?=$this->Form->control("keyword03",['type'=>'checkbox','label'=>'調整']) ?>
-        <?=$this->Form->control("keyword06",['type'=>'checkbox','label'=>'連戦']) ?>
-        <?=$this->Form->control("keyword07",['type'=>'checkbox','label'=>'一本勝負']) ?>
+        <?=$this->Form->control("keyword00",['type'=>'checkbox','label'=>'競技志向','default'=>$user['keyword00']]) ?>
+        <?=$this->Form->control("keyword01",['type'=>'checkbox','label'=>'ショップ大会','default'=>$user['keyword01']]) ?>
+        <?=$this->Form->control("keyword02",['type'=>'checkbox','label'=>'フリー対戦','default'=>$user['keyword02']]) ?>
+        <?=$this->Form->control("keyword03",['type'=>'checkbox','label'=>'調整','default'=>$user['keyword03']]) ?>
+        <?=$this->Form->control("keyword06",['type'=>'checkbox','label'=>'連戦','default'=>$user['keyword06']]) ?>
+        <?=$this->Form->control("keyword07",['type'=>'checkbox','label'=>'一本勝負','default'=>$user['keyword07']]) ?>
     </fieldset>
     <?=$this->Form->button("再検索")?>
     <?=$this->Form->end()?>

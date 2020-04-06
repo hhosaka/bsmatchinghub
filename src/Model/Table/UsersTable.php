@@ -76,7 +76,6 @@ class UsersTable extends Table
         $validator
             ->scalar('status')
             ->maxLength('status', 32)
-            ->requirePresence('status', 'create')
             ->notEmptyString('status');
 
         $validator
@@ -86,6 +85,10 @@ class UsersTable extends Table
             ->dateTime('end_time');
 
         $validator
+            ->boolean('accept')
+            ->requirePresence('accept', 'create');
+
+            $validator
             ->scalar('skype_account')
             ->maxLength('skype_account', 128)
             ->requirePresence('skype_account', 'create')

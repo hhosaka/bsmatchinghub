@@ -60,7 +60,7 @@ class User extends Entity
         'status' => true,
         'start_time' => true,
         'end_time' => true,
-        'list_mode' => true,
+        'accept' => true,
         'skype_account' => true,
         'twitter_account' => true,
         'twitter_handle_name' => true,
