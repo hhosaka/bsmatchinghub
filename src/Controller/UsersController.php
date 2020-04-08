@@ -36,8 +36,8 @@ class UsersController extends AppController
     public function isAuthorized($user = null)
     {
         $action = $this->request->params['action'];
-        if(in_array($action,['index','editUser','viewUser'])){
-            return true;
+        if(in_array($action,['index','activate','deactivate','settings'])){
+                return true;
         }
         return parent::isAuthorized($user);
     }
@@ -105,6 +105,8 @@ class UsersController extends AppController
     {
         $user = $this->Users->findById($this->Auth->user()['id'])->first();
         $conds[]=['status'=>'active'];
+        $conds[]=['start_time <'=> strtotime('+60 minute')];
+        $conds[]=['end_time >='=> time()];
         if($this->request->is('post'))
             $data = $this->request->data;
         else
@@ -196,11 +198,27 @@ class UsersController extends AppController
         $this->set(compact('user'));
     }
 
-    public function editUser()
+    public function settings()
     {
         $this->edit($this->Auth->user()['id']);
     }
 
+    public function activate()
+    {
+        $user = $this->Users->get($this->Auth->user()['id']);
+        $user['status'] = 'ACTIVE';
+        $user['start_time'] = time();
+        $this->Users->save($user);
+        return $this->redirect(['action' => 'index']);
+    }
+
+    public function deactivate()
+    {
+        $user = $this->Users->get($this->Auth->user()['id']);
+        $user['status'] = 'INACTIVE';
+        $this->Users->save($user);
+        return $this->redirect(['action' => 'index']);
+    }
     /**
      * Delete method
      *

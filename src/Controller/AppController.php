@@ -64,7 +64,7 @@ class AppController extends Controller
                 'controller' => 'Users',
                 'action' => 'index',
             ],
-            'authError' => 'ログインされていないか、権限がありません。ログインしてください。(ERROR001)'
+            'authError' => 'ログインされていないか、権限がありません。権限のあるアカウントでログインしてください。(ERROR001)'
         ]);
         // $this->viewBuilder()->setLayout('original');
 
