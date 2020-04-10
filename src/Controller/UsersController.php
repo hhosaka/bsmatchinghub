@@ -105,8 +105,8 @@ class UsersController extends AppController
     {
         $user = $this->Users->findById($this->Auth->user()['id'])->first();
         $conds[]=['status'=>'active'];
-        $conds[]=['start_time <'=> strtotime('+60 minute')];
-        $conds[]=['end_time >='=> time()];
+        $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime('+60 minute'))];
+        $conds[]=['end_time >='=> date("Y/m/d H:i:s")];
         if($this->request->is('post'))
             $data = $this->request->data;
         else
