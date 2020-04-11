@@ -35,8 +35,8 @@ class UsersController extends AppController
 
     public function isAuthorized($user = null)
     {
-        $action = $this->request->params['action'];
-        if(in_array($action,['index','activate','deactivate','settings','chat'])){
+        $action = $this->request->getParam('action');
+        if(in_array($action,['index','activate','deactivate','settings','chat','viewUser'])){
                 return true;
         }
         return parent::isAuthorized($user);
@@ -70,22 +70,17 @@ class UsersController extends AppController
         $redirectUrl = $this->request->getQuery('redirectUrl');
         echo $redirectUrl;
         if ($this->request->is('post')) {
-            if($this->request->data['accept']){
-                if($this->Users->findByUsername($user['username'])==null){
-                    $user = $this->Users->patchEntity($user, $this->request->getData());
-                    $user['role'] = 'guest';
-                    if ($this->Users->save($user)) {
-                        $this->Flash->success(__('登録完了しました。'));
-                        $this->Auth->setUser($user);
-                        
-                        return $this->redirect($redirectUrl);
-                    }
-                    else{
-                        $this->Flash->error(__('登録に失敗しました。'));
-                    }
+            if($this->request->getData()['accept']){
+                $user = $this->Users->patchEntity($user, $this->request->getData());
+                $user['role'] = 'guest';
+                if ($this->Users->save($user)) {
+                    $this->Flash->success(__('登録完了しました。'));
+                    $this->Auth->setUser($user);
+                    
+                    return $this->redirect($redirectUrl);
                 }
                 else{
-                    $this->Flash->error(__('メールアドレスは既に登録されています。'));
+                    $this->Flash->error(__('登録に失敗しました。'));
                 }
             }else{
                 $this->Flash->error(__('登録の為には利用規約への同意が必要です。'));
@@ -112,11 +107,12 @@ class UsersController extends AppController
     public function index()
     {
         $user = $this->Users->findById($this->Auth->user()['id'])->first();
+        $conds[]=['id !='=>$user['id']];
         $conds[]=['status'=>'active'];
         $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime('+60 minute'))];
         $conds[]=['end_time >='=> date("Y/m/d H:i:s")];
         if($this->request->is('post'))
-            $data = $this->request->data;
+            $data = $this->request->getData();
         else
             $data = $user;
 
@@ -157,9 +153,9 @@ class UsersController extends AppController
         $this->set('user', $user);
     }
 
-    public function viewUser()
+    public function viewUser($id = null)
     {
-        $this->view($this->Auth->user()['id']);
+        $this->view($id);
     }
 
     /**

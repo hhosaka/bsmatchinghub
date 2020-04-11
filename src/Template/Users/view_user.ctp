@@ -44,7 +44,7 @@
             <td><?= h($user->end_time) ?></td>
         </tr>
         <tr>
-            <th scope="row"><?= __('どんな対戦を希望しているか（対戦レベル）') ?></th>
+            <th scope="row"><?= __('希望対戦レベル') ?></th>
         </tr>
         <tr>
             <th scope="row"><?= __('競技志向') ?></th>
@@ -63,7 +63,7 @@
             <td><?= $user->keyword03 ? __('Yes') : __('No'); ?></td>
         </tr>
         <tr>
-            <th scope="row"><?= __('どんな対戦を希望しているか（時間）') ?></th>
+            <th scope="row"><?= __('希望対戦時間') ?></th>
         </tr>
         <tr>
             <th scope="row"><?= __('連戦') ?></th>
@@ -73,38 +73,5 @@
             <th scope="row"><?= __('一本勝負') ?></th>
             <td><?= $user->keyword07 ? __('Yes') : __('No'); ?></td>
         </tr>
-        <tr>
-            <th scope="row"><?= __('登録日時') ?></th>
-            <td><?= h($user->creation_date) ?></td>
-        </tr>
-        <tr>
-            <th scope="row"><?= __('更新日時') ?></th>
-            <td><?= h($user->modification_date) ?></td>
-        </tr>
     </table>
-    <div class="related">
-        <h4><?= __('ブラックリスト') ?></h4>
-        <?php if (!empty($user->blacks)): ?>
-        <table cellpadding="0" cellspacing="0">
-            <tr>
-                <th scope="col"><?= __('Id') ?></th>
-                <th scope="col"><?= __('Owner Id') ?></th>
-                <th scope="col"><?= __('User Id') ?></th>
-                <th scope="col" class="actions"><?= __('Actions') ?></th>
-            </tr>
-            <?php foreach ($user->blacks as $blacks): ?>
-            <tr>
-                <td><?= h($blacks->id) ?></td>
-                <td><?= h($blacks->owner_id) ?></td>
-                <td><?= h($blacks->user_id) ?></td>
-                <td class="actions">
-                    <?= $this->Html->link(__('View'), ['controller' => 'Blacks', 'action' => 'view', $blacks->id]) ?>
-                    <?= $this->Html->link(__('Edit'), ['controller' => 'Blacks', 'action' => 'edit', $blacks->id]) ?>
-                    <?= $this->Form->postLink(__('Delete'), ['controller' => 'Blacks', 'action' => 'delete', $blacks->id], ['confirm' => __('Are you sure you want to delete # {0}?', $blacks->id)]) ?>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </table>
-        <?php endif; ?>
-    </div>
 </div>
