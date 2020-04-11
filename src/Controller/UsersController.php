@@ -36,7 +36,7 @@ class UsersController extends AppController
     public function isAuthorized($user = null)
     {
         $action = $this->request->params['action'];
-        if(in_array($action,['index','activate','deactivate','settings'])){
+        if(in_array($action,['index','activate','deactivate','settings','chat'])){
                 return true;
         }
         return parent::isAuthorized($user);
@@ -71,13 +71,21 @@ class UsersController extends AppController
         echo $redirectUrl;
         if ($this->request->is('post')) {
             if($this->request->data['accept']){
-                $user = $this->Users->patchEntity($user, $this->request->getData());
-                $user['role'] = 'guest';
-                if ($this->Users->saveOrFail($user)) {
-                    $this->Flash->success(__('登録完了しました。'));
-                    $this->Auth->setUser($user);
-                    
-                    return $this->redirect($redirectUrl);
+                if($this->Users->findByUsername($user['username'])==null){
+                    $user = $this->Users->patchEntity($user, $this->request->getData());
+                    $user['role'] = 'guest';
+                    if ($this->Users->save($user)) {
+                        $this->Flash->success(__('登録完了しました。'));
+                        $this->Auth->setUser($user);
+                        
+                        return $this->redirect($redirectUrl);
+                    }
+                    else{
+                        $this->Flash->error(__('登録に失敗しました。'));
+                    }
+                }
+                else{
+                    $this->Flash->error(__('メールアドレスは既に登録されています。'));
                 }
             }else{
                 $this->Flash->error(__('登録の為には利用規約への同意が必要です。'));
@@ -198,6 +206,11 @@ class UsersController extends AppController
         $this->set(compact('user'));
     }
 
+    public function chat($id = null)
+    {
+        // TODO
+    }
+
     public function settings()
     {
         $this->edit($this->Auth->user()['id']);
@@ -205,11 +218,22 @@ class UsersController extends AppController
 
     public function activate()
     {
+        echo 'test 1';
         $user = $this->Users->get($this->Auth->user()['id']);
-        $user['status'] = 'ACTIVE';
-        $user['start_time'] = time();
-        $this->Users->save($user);
-        return $this->redirect(['action' => 'index']);
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $user = $this->Users->patchEntity($user, $this->request->getData());
+            $user['status'] = 'ACTIVE';
+            if ($this->Users->save($user)) {
+                echo 'test 2';
+                $this->Flash->success(__('Activated.'));
+                return $this->redirect(['action' => 'index']);
+            }
+            else{
+                $this->Flash->error(__('The user could not be saved. Please, try again.'));
+            }
+        }
+        echo 'test 3';
+        $this->set(compact('user'));
     }
 
     public function deactivate()
