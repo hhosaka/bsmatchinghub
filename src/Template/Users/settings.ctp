@@ -35,4 +35,24 @@
     </fieldset>
     <?= $this->Form->button(__('送信')) ?>
     <?= $this->Form->end() ?>
+    <div class="related">
+        <h4><?= __('Friends') ?></h4>
+        <?php if (!empty($user->Friends)): ?>
+        <table cellpadding="0" cellspacing="0">
+            <tr>
+                <th scope="col"><?= __('User Id') ?></th>
+                <th scope="col" class="actions"><?= __('Actions') ?></th>
+            </tr>
+            <?php foreach ($user->Frineds as $friends): ?>
+            <tr>
+                <td><?= h($friends->user_id) ?></td>
+                <td class="actions">
+                    <?= $this->Form->postLink(__('Delete'), ['controller' => 'Friends', 'action' => 'delete', $friends->id], ['confirm' => __('Are you sure you want to delete # {0}?', $friends->id)]) ?>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </table>
+        <?php endif; ?>
+    </div>
+
 </div>

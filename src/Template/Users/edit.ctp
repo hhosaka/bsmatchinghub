@@ -14,6 +14,8 @@
             )
         ?></li>
         <li><?= $this->Html->link(__('List Users'), ['action' => 'index']) ?></li>
+        <li><?= $this->Html->link(__('List Friends'), ['controller' => 'Friends', 'action' => 'index']) ?></li>
+        <li><?= $this->Html->link(__('New Friends'), ['controller' => 'Friends', 'action' => 'add']) ?></li>
         <li><?= $this->Html->link(__('List Blacks'), ['controller' => 'Blacks', 'action' => 'index']) ?></li>
         <li><?= $this->Html->link(__('New Black'), ['controller' => 'Blacks', 'action' => 'add']) ?></li>
     </ul>
@@ -33,12 +35,10 @@
             echo $this->Form->control('twitter_account');
             echo $this->Form->control('twitter_handle_name');
             echo $this->Form->control('comment');
-            echo $this->Form->control('keyword00',['type'=>'checkbox','label'=>'競技志向']);
-            echo $this->Form->control('keyword01',['type'=>'checkbox','label'=>'ショップ大会']);
-            echo $this->Form->control('keyword02',['type'=>'checkbox','label'=>'フリー対戦']);
-            echo $this->Form->control('keyword03',['type'=>'checkbox','label'=>'調整']);
-            echo $this->Form->control('keyword06',['type'=>'checkbox','label'=>'連戦']);
-            echo $this->Form->control('keyword07',['type'=>'checkbox','label'=>'一本勝負']);
+            echo $this->Form->control('short_comment');
+            echo $this->Form->control('use_friends');
+            echo $this->Form->control('keyword');
+            echo $this->Form->control('search_keyword');
         ?>
     </fieldset>
     <?= $this->Form->button(__('Submit')) ?>

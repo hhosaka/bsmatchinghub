@@ -176,6 +176,7 @@ class UsersController extends AppController
     {
         $user = $this->Users->get($id, [
             'contain' => ['Blacks'],
+            'contain' => ['Friends'],
         ]);
 
         $this->set('user', $user);
@@ -216,7 +217,7 @@ class UsersController extends AppController
     public function edit($id = null, $keyword = null)
     {
         $user = $this->Users->get($id, [
-            'contain' => [],
+            'contain' => ['Friends'],
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $user = $this->Users->patchEntity($user, $this->request->getData());
