@@ -44,34 +44,8 @@
             <td><?= h($user->end_time) ?></td>
         </tr>
         <tr>
-            <th scope="row"><?= __('希望対戦レベル') ?></th>
-        </tr>
-        <tr>
-            <th scope="row"><?= __('競技志向') ?></th>
-            <td><?= $user->keyword00 ? __('Yes') : __('No'); ?></td>
-        </tr>
-        <tr>
-            <th scope="row"><?= __('ショップ大会') ?></th>
-            <td><?= $user->keyword01 ? __('Yes') : __('No'); ?></td>
-        </tr>
-        <tr>
-            <th scope="row"><?= __('フリー対戦') ?></th>
-            <td><?= $user->keyword02 ? __('Yes') : __('No'); ?></td>
-        </tr>
-        <tr>
-            <th scope="row"><?= __('調整') ?></th>
-            <td><?= $user->keyword03 ? __('Yes') : __('No'); ?></td>
-        </tr>
-        <tr>
-            <th scope="row"><?= __('希望対戦時間') ?></th>
-        </tr>
-        <tr>
-            <th scope="row"><?= __('連戦') ?></th>
-            <td><?= $user->keyword06 ? __('Yes') : __('No'); ?></td>
-        </tr>
-        <tr>
-            <th scope="row"><?= __('一本勝負') ?></th>
-            <td><?= $user->keyword07 ? __('Yes') : __('No'); ?></td>
+            <th scope="row"><?= __('キーワード') ?></th>
+            <td><?= h($user->keyword) ?></td>
         </tr>
     </table>
 </div>

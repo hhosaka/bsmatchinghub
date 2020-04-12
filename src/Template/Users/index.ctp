@@ -58,29 +58,7 @@
     <h3><?= __('検索条件') ?></h3>
     <?=$this->Form->create() ?>
     <fieldset>
-    <table cellpadding="0" cellspacing="0">
-        <thead>
-            <th><?= __('対戦レベル') ?></th>
-            <th><?= __('対戦回数') ?></th>
-        </thead>
-        <tbody>
-            <tr>
-                <td><?=$this->Form->control("keyword00",['type'=>'checkbox','label'=>'競技志向','default'=>$user['keyword00']]) ?></td>
-                <td><?=$this->Form->control("keyword06",['type'=>'checkbox','label'=>'連戦','default'=>$user['keyword06']]) ?></td>
-            </tr>
-            <tr>
-                <td><?=$this->Form->control("keyword01",['type'=>'checkbox','label'=>'ショップ大会','default'=>$user['keyword01']]) ?></td>
-                <td><?=$this->Form->control("keyword07",['type'=>'checkbox','label'=>'一本勝負','default'=>$user['keyword07']]) ?></td>
-            </tr>
-            <tr>
-                <td><?=$this->Form->control("keyword02",['type'=>'checkbox','label'=>'フリー対戦','default'=>$user['keyword02']]) ?></td>
-            </tr>
-            <tr>
-                <td><?=$this->Form->control("keyword03",['type'=>'checkbox','label'=>'調整','default'=>$user['keyword03']]) ?></td>
-            </tr>
-        </tbody>
-    </table>
-
+    <?=$this->Form->control('search_keyword',['label'=>'検索用キーワード','default'=>$user['search_keyword']]) ?>
     </fieldset>
     <?=$this->Form->button("再検索")?>
     <?=$this->Form->end()?>

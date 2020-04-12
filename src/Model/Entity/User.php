@@ -20,22 +20,6 @@ use Cake\Auth\DefaultPasswordHasher;
  * @property string|null $twitter_account
  * @property string|null $twitter_handle_name
  * @property string $comment
- * @property bool $keyword00
- * @property bool $keyword01
- * @property bool $keyword02
- * @property bool $keyword03
- * @property bool $keyword04
- * @property bool $keyword05
- * @property bool $keyword06
- * @property bool $keyword07
- * @property bool $keyword08
- * @property bool $keyword09
- * @property bool $keyword10
- * @property bool $keyword11
- * @property bool $keyword12
- * @property bool $keyword13
- * @property bool $keyword14
- * @property bool $keyword15
  * @property \Cake\I18n\FrozenTime $creation_date
  * @property \Cake\I18n\FrozenTime $modification_date
  *
@@ -65,22 +49,10 @@ class User extends Entity
         'twitter_account' => true,
         'twitter_handle_name' => true,
         'comment' => true,
-        'keyword00' => true,
-        'keyword01' => true,
-        'keyword02' => true,
-        'keyword03' => true,
-        'keyword04' => true,
-        'keyword05' => true,
-        'keyword06' => true,
-        'keyword07' => true,
-        'keyword08' => true,
-        'keyword09' => true,
-        'keyword10' => true,
-        'keyword11' => true,
-        'keyword12' => true,
-        'keyword13' => true,
-        'keyword14' => true,
-        'keyword15' => true,
+        'short_comment' => true,
+        'keyword' => true,
+        'search_keyword' => true,
+        'use_freinds' => true,
         'creation_date' => true,
         'modification_date' => true,
         'blacks' => true,

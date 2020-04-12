@@ -12,7 +12,7 @@ use Cake\ORM\Entity;
  *
  * @property \App\Model\Entity\User $user
  */
-class Black extends Entity
+class Friend extends Entity
 {
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().

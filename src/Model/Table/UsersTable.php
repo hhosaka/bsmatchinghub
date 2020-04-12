@@ -39,6 +39,9 @@ class UsersTable extends Table
         $this->hasMany('Blacks', [
             'foreignKey' => 'user_id',
         ]);
+        $this->hasMany('Friends', [
+            'foreignKey' => 'user_id',
+        ]);
     }
 
     /**
@@ -109,52 +112,21 @@ class UsersTable extends Table
             ->maxLength('comment', 1024);
 
         $validator
-            ->boolean('keyword00');
+            ->scalar('short_comment')
+            ->maxLength('short_comment', 64);
 
         $validator
-            ->boolean('keyword01');
+            ->scalar('keyword')
+            ->maxLength('keyword', 512)
+            ->allowEmptyString('keyword');
 
         $validator
-            ->boolean('keyword02');
+            ->scalar('search_keyword')
+            ->maxLength('search_keyword', 512)
+            ->allowEmptyString('search_keyword');
 
         $validator
-            ->boolean('keyword03');
-
-        $validator
-            ->boolean('keyword04');
-
-        $validator
-            ->boolean('keyword05');
-
-        $validator
-            ->boolean('keyword06');
-
-        $validator
-            ->boolean('keyword07');
-
-        $validator
-            ->boolean('keyword08');
-
-        $validator
-            ->boolean('keyword09');
-
-        $validator
-            ->boolean('keyword10');
-
-        $validator
-            ->boolean('keyword11');
-
-        $validator
-            ->boolean('keyword12');
-
-        $validator
-            ->boolean('keyword13');
-
-        $validator
-            ->boolean('keyword14');
-
-        $validator
-            ->boolean('keyword15');
+            ->boolean('use_friends');
 
         $validator
             ->dateTime('creation_date');

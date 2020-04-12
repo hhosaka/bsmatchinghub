@@ -99,6 +99,35 @@ class UsersController extends AppController
     public function tos(){
 
     }
+    private function convStr2Conds($keywords){
+        $conds = null;
+        foreach(explode("|", $keywords) as $keyword){
+            $conds[] = ['keyword LIKE'=>'%'.$keyword.'%'];
+        }
+        return $conds;
+    }
+
+    private function convFlags2Conds($flags){
+        $conds = null;
+        if($flags['keyword00']) $conds[]=['keyword LIKE'=>'%競技志向%'];
+        if($flags['keyword01']) $conds[]=['keyword LIKE'=>'%ショップ大会%'];
+        if($flags['keyword02']) $conds[]=['keyword LIKE'=>'%フリー対戦%'];
+        if($flags['keyword03']) $conds[]=['keyword LIKE'=>'%調整%'];
+        if($flags['keyword06']) $conds[]=['keyword LIKE'=>'%連戦%'];
+        if($flags['keyword07']) $conds[]=['keyword LIKE'=>'%一本勝負%'];
+        return $conds;
+    }
+
+    private function convFlags2Keyword($flags){
+        $keyword = "";
+        if($flags['keyword00']) $keyword=$keyword.'競技志向';
+        if($flags['keyword01']) $keyword=$keyword.'ショップ大会';
+        if($flags['keyword02']) $keyword=$keyword.'フリー対戦';
+        if($flags['keyword03']) $keyword=$keyword.'調整';
+        if($flags['keyword06']) $keyword=$keyword.'連戦';
+        if($flags['keyword07']) $keyword=$keyword.'一本勝負';
+        return $keyword;
+    }
 
     /**
      * Index method
@@ -108,26 +137,24 @@ class UsersController extends AppController
     public function index()
     {
         $user = $this->Users->findById($this->Auth->user()['id'])->first();
+
         $conds[]=['id !='=>$user['id']];
         $conds[]=['status'=>'active'];
         $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime('+60 minute'))];
         $conds[]=['end_time >='=> date("Y/m/d H:i:s")];
-        if($this->request->is('post'))
-            $data = $this->request->getData();
-        else
-            $data = $user;
-
-        if($data['keyword00']) $conds[]=['keyword00'=>'1'];
-        if($data['keyword01']) $conds[]=['keyword01'=>'1'];
-        if($data['keyword02']) $conds[]=['keyword02'=>'1'];
-        if($data['keyword03']) $conds[]=['keyword03'=>'1'];
-        if($data['keyword06']) $conds[]=['keyword06'=>'1'];
-        if($data['keyword07']) $conds[]=['keyword07'=>'1'];
+        if($this->request->is('post')){
+            $keywords = $this->request->getData()['search_keyword'];
+            $user['search_keyword'] = $keywords;
+        }else{
+            $keywords = $user['keyword'];
+        }
+        $conds = array_merge($conds, $this->convStr2Conds($keywords));
 
         $query = $this->Users->find('all',['conditions'=>['and'=>[$conds]]]);
 
         $users = $this->paginate($query);
 
+        var_dump($user);
         $this->set(compact('user', 'users'));
     }
 
@@ -186,7 +213,7 @@ class UsersController extends AppController
      * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function edit($id = null)
+    public function edit($id = null, $keyword = null)
     {
         $user = $this->Users->get($id, [
             'contain' => [],
@@ -229,7 +256,7 @@ class UsersController extends AppController
         $message = $message . "さんが対戦希望しています。\r\n";
         $message = $message . "開始時間". $user['start_time'] . "\r\n";
         $message = $message . "終了時間". $user['end_time'] . "\r\n";
-        $message = $message . "「". $user['comment'] . "」\r\n";
+        $message = $message . "「". mb_substr($user['comment'],0,64). "」\r\n";
         $message = $message . "http://plumbline.xsrv.jp/bsmh/users";
 
         $this->postTweet($message);

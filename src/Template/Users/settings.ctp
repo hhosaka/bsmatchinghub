@@ -22,17 +22,6 @@
 <div class="users form large-9 medium-8 columns content">
     <?= $this->Form->create($user) ?>
     <fieldset>
-        <legend><?= __('希望する対戦の情報です。この情報をキーに検索されます。') ?></legend>
-        <?php
-            echo $this->Form->control('comment',['label'=>'コメント（公開されます）']);
-            echo $this->Form->control('keyword00',['type'=>'checkbox','label'=>'競技志向']);
-            echo $this->Form->control('keyword01',['type'=>'checkbox','label'=>'ショップ大会']);
-            echo $this->Form->control('keyword02',['type'=>'checkbox','label'=>'フリー対戦']);
-            echo $this->Form->control('keyword03',['type'=>'checkbox','label'=>'調整']);
-            echo $this->Form->control('keyword06',['type'=>'checkbox','label'=>'連戦']);
-            echo $this->Form->control('keyword07',['type'=>'checkbox','label'=>'一本勝負']);
-        ?>
-        <legend><?= __('ユーザー情報') ?></legend>
         <?php
             echo $this->Form->control('username',['type'=>'email','label'=>'メールアドレス']);
             echo $this->Form->control('password',['label'=>'パスワード']);
@@ -40,6 +29,8 @@
             echo $this->Form->control('skype_account',['label'=>'Skype ID']);
             echo $this->Form->control('twitter_account',['label'=>'Twitter ID']);
             echo $this->Form->control('twitter_handle_name',['label'=>'Twitterのハンドルネーム']);
+            echo $this->Form->control("keyword",['label'=>'キーワード']);
+            echo $this->Form->control("search_keyword",['label'=>'検索キーワード']);
         ?>
     </fieldset>
     <?= $this->Form->button(__('送信')) ?>
