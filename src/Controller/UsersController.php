@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use App\Controller\AppController;
 use Cake\Event\Event;
+use Abraham\TwitterOAuth\TwitterOAuth;
 
 /**
  * Users Controller
@@ -202,6 +203,17 @@ class UsersController extends AppController
         $this->set(compact('user'));
     }
 
+    private function postTweet($message){
+        $consumerKey       = "Yh0Z8XBVp7jy617X6xo5o0QGr";
+        $consumerSecret    = "4GhXiyGaIuxTbwEaey3jp8d7APb7DvIVy9LlKHN2YX5gSVoJXQ";
+        $accessToken       = "1007261840940777472-DfOwsrO2xRWcacvT6TFckefjaLI8EG";
+        $accessTokenSecret = "TI2KSQy1XJ7Y1e95V8d8caYL73QuDAw8BCFh6Yni6xkbh";
+        
+        $twitter = new TwitterOAuth($consumerKey, $consumerSecret, $accessToken, $accessTokenSecret);
+
+        $result = $twitter->post("statuses/update", ["status" => $message]);
+    }
+
     public function chat($id = null)
     {
         // TODO
@@ -210,6 +222,17 @@ class UsersController extends AppController
     public function settings()
     {
         $this->edit($this->Auth->user()['id']);
+    }
+
+    private function postActivateMessage($user){
+        $message = $user['handlename'];
+        $message = $message . "さんが対戦希望しています。\r\n";
+        $message = $message . "開始時間". $user['start_time'] . "\r\n";
+        $message = $message . "終了時間". $user['end_time'] . "\r\n";
+        $message = $message . "「". $user['comment'] . "」\r\n";
+        $message = $message . "http://plumbline.xsrv.jp/bsmh/users";
+
+        $this->postTweet($message);
     }
 
     public function activate()
@@ -222,6 +245,7 @@ class UsersController extends AppController
             if ($this->Users->save($user)) {
                 echo 'test 2';
                 $this->Flash->success(__('Activated.'));
+                $this->postActivateMessage($user);
                 return $this->redirect(['action' => 'index']);
             }
             else{
