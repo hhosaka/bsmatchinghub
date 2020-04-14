@@ -175,10 +175,12 @@ class UsersController extends AppController
     public function view($id = null)
     {
         $user = $this->Users->get($id, [
-            'contain' => ['Blacks'],
-            'contain' => ['Friends'],
+            'contain' => ['Blacks','Friends'],
         ]);
 
+        $this->pagenate = [
+            'contain' => ['Blacks','Friends'],
+        ];
         $this->set('user', $user);
     }
 
@@ -217,7 +219,7 @@ class UsersController extends AppController
     public function edit($id = null, $keyword = null)
     {
         $user = $this->Users->get($id, [
-            'contain' => ['Friends'],
+            'contain' => ['Friends'=>['Users']],
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $user = $this->Users->patchEntity($user, $this->request->getData());
@@ -265,13 +267,11 @@ class UsersController extends AppController
 
     public function activate()
     {
-        echo 'test 1';
         $user = $this->Users->get($this->Auth->user()['id']);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $user = $this->Users->patchEntity($user, $this->request->getData());
             $user['status'] = 'ACTIVE';
             if ($this->Users->save($user)) {
-                echo 'test 2';
                 $this->Flash->success(__('Activated.'));
                 $this->postActivateMessage($user);
                 return $this->redirect(['action' => 'index']);
@@ -280,7 +280,6 @@ class UsersController extends AppController
                 $this->Flash->error(__('The user could not be saved. Please, try again.'));
             }
         }
-        echo 'test 3';
         $this->set(compact('user'));
     }
 

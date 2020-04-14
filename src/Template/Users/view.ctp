@@ -13,6 +13,8 @@
         <li><?= $this->Html->link(__('New User'), ['action' => 'add']) ?> </li>
         <li><?= $this->Html->link(__('List Blacks'), ['controller' => 'Blacks', 'action' => 'index']) ?> </li>
         <li><?= $this->Html->link(__('New Black'), ['controller' => 'Blacks', 'action' => 'add']) ?> </li>
+        <li><?= $this->Html->link(__('List Friends'), ['controller' => 'Friends', 'action' => 'index']) ?> </li>
+        <li><?= $this->Html->link(__('New Friend'), ['controller' => 'Friends', 'action' => 'add']) ?> </li>
     </ul>
 </nav>
 <div class="users view large-9 medium-8 columns content">
@@ -39,10 +41,6 @@
             <td><?= h($user->status) ?></td>
         </tr>
         <tr>
-            <th scope="row"><?= __('List Mode') ?></th>
-            <td><?= h($user->list_mode) ?></td>
-        </tr>
-        <tr>
             <th scope="row"><?= __('Skype Account') ?></th>
             <td><?= h($user->skype_account) ?></td>
         </tr>
@@ -57,6 +55,18 @@
         <tr>
             <th scope="row"><?= __('Comment') ?></th>
             <td><?= h($user->comment) ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?= __('Short Comment') ?></th>
+            <td><?= h($user->short_comment) ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?= __('Keyword') ?></th>
+            <td><?= h($user->keyword) ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?= __('Search Keyword') ?></th>
+            <td><?= h($user->search_keyword) ?></td>
         </tr>
         <tr>
             <th scope="row"><?= __('Id') ?></th>
@@ -78,26 +88,51 @@
             <th scope="row"><?= __('Modification Date') ?></th>
             <td><?= h($user->modification_date) ?></td>
         </tr>
+        <tr>
+            <th scope="row"><?= __('Accept') ?></th>
+            <td><?= $user->accept ? __('Yes') : __('No'); ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?= __('Use Friends') ?></th>
+            <td><?= $user->use_friends ? __('Yes') : __('No'); ?></td>
+        </tr>
     </table>
     <div class="related">
         <h4><?= __('Related Blacks') ?></h4>
         <?php if (!empty($user->blacks)): ?>
         <table cellpadding="0" cellspacing="0">
             <tr>
-                <th scope="col"><?= __('Id') ?></th>
-                <th scope="col"><?= __('Owner Id') ?></th>
                 <th scope="col"><?= __('User Id') ?></th>
                 <th scope="col" class="actions"><?= __('Actions') ?></th>
             </tr>
             <?php foreach ($user->blacks as $blacks): ?>
             <tr>
-                <td><?= h($blacks->id) ?></td>
-                <td><?= h($blacks->owner_id) ?></td>
-                <td><?= h($blacks->user_id) ?></td>
+                <td><?= h($blacks->user->handlename) ?></td>
                 <td class="actions">
                     <?= $this->Html->link(__('View'), ['controller' => 'Blacks', 'action' => 'view', $blacks->id]) ?>
                     <?= $this->Html->link(__('Edit'), ['controller' => 'Blacks', 'action' => 'edit', $blacks->id]) ?>
                     <?= $this->Form->postLink(__('Delete'), ['controller' => 'Blacks', 'action' => 'delete', $blacks->id], ['confirm' => __('Are you sure you want to delete # {0}?', $blacks->id)]) ?>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </table>
+        <?php endif; ?>
+    </div>
+    <div class="related">
+        <h4><?= __('Related Friends') ?></h4>
+        <?php if (!empty($user->friends)): ?>
+        <table cellpadding="0" cellspacing="0">
+            <tr>
+                <th scope="col"><?= __('User Id') ?></th>
+                <th scope="col" class="actions"><?= __('Actions') ?></th>
+            </tr>
+            <?php foreach ($user->friends as $friends): ?>
+            <tr>
+                <td><?= h($friends->handlename) ?></td>
+                <td class="actions">
+                    <?= $this->Html->link(__('View'), ['controller' => 'Friends', 'action' => 'view', $friends->id]) ?>
+                    <?= $this->Html->link(__('Edit'), ['controller' => 'Friends', 'action' => 'edit', $friends->id]) ?>
+                    <?= $this->Form->postLink(__('Delete'), ['controller' => 'Friends', 'action' => 'delete', $friends->id], ['confirm' => __('Are you sure you want to delete # {0}?', $friends->id)]) ?>
                 </td>
             </tr>
             <?php endforeach; ?>

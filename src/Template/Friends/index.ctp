@@ -7,7 +7,7 @@
 <nav class="large-3 medium-4 columns" id="actions-sidebar">
     <ul class="side-nav">
         <li class="heading"><?= __('Actions') ?></li>
-        <li><?= $this->Html->link(__('New Friend'), ['action' => 'add']) ?></li>
+        <li><?= $this->Html->link(__('メイン画面'), ['controller'=>'Users', 'action' => 'index']) ?></li>
     </ul>
 </nav>
 <div class="friends index large-9 medium-8 columns content">
@@ -22,9 +22,9 @@
         <tbody>
             <?php foreach ($friends as $friend): ?>
             <tr>
-                <td><?= $friend->has('user') ? $this->Html->link($friend->user->handlename, ['controller' => 'Users', 'action' => 'view', $friend->user->id]) : '' ?></td>
+                <td><?= $friend->has('user') ? $this->Html->link($friend->user->handlename, ['controller' => 'Users', 'action' => 'viewUser', $friend->user->id]) : '' ?></td>
                 <td class="actions">
-                    <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $friend->id], ['confirm' => __('Are you sure you want to delete # {0}?', $friend->id)]) ?>
+                    <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $friend->id], ['confirm' => __('Are you sure you want to delete # {0}?', $friend->user->handlename)]) ?>
                 </td>
             </tr>
             <?php endforeach; ?>

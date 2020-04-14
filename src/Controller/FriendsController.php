@@ -12,6 +12,11 @@ use App\Controller\AppController;
  */
 class FriendsController extends AppController
 {
+    public function isAuthorized($user = null)
+    {
+        return true;
+    }
+
     /**
      * Index method
      *
@@ -22,25 +27,9 @@ class FriendsController extends AppController
         $this->paginate = [
             'contain' => [ 'Users'],
         ];
-        $friends = $this->paginate($this->Friends);
+        $friends = $this->paginate($this->Friends->findByOwnerId($this->Auth->user()['id']));
 
         $this->set(compact('friends'));
-    }
-
-    /**
-     * View method
-     *
-     * @param string|null $id Friend id.
-     * @return \Cake\Http\Response|null
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function view($id = null)
-    {
-        $friend = $this->Friends->get($id, [
-            'contain' => [ 'Users'],
-        ]);
-
-        $this->set('friend', $friend);
     }
 
     /**
@@ -48,48 +37,22 @@ class FriendsController extends AppController
      *
      * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
      */
-    public function add()
+    public function add($userid)
     {
-        $friend = $this->Friends->newEntity();
-        if ($this->request->is('post')) {
-            $friend = $this->Friends->patchEntity($friend, $this->request->getData());
-            $friend['ouner_id'] = $this->Auth->user()['id'];
+        $ownerid = $this->Auth->user()['id'];
+        if(!$this->Friends->exists(['owner_id'=>$ownerid, 'user_id'=>$userid])){
+            $friend = $this->Friends->newEntity();
+            $friend['owner_id'] = $ownerid;
+            $friend['user_id'] = $userid;
+    
             if ($this->Friends->save($friend)) {
                 $this->Flash->success(__('The friend has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The friend could not be saved. Please, try again.'));
-        }
-        $owners = $this->Friends->Users->find('list', ['limit' => 200]);
-        $users = $this->Friends->Users->find('list', ['limit' => 200]);
-        $this->set(compact('friend', 'owners', 'users'));
-    }
-
-    /**
-     * Edit method
-     *
-     * @param string|null $id Friend id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $friend = $this->Friends->get($id, [
-            'contain' => [],
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $friend = $this->Friends->patchEntity($friend, $this->request->getData());
-            if ($this->Friends->save($friend)) {
-                $this->Flash->success(__('The friend has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
+            else{
+                $this->Flash->error(__('The friend could not be saved. Please, try again.'));
             }
-            $this->Flash->error(__('The friend could not be saved. Please, try again.'));
         }
-        $owners = $this->Friends->Owners->find('list', ['limit' => 200]);
-        $users = $this->Friends->Users->find('list', ['limit' => 200]);
-        $this->set(compact('friend', 'owners', 'users'));
+        $this->redirect($this->request->referer());
     }
 
     /**
@@ -101,14 +64,18 @@ class FriendsController extends AppController
      */
     public function delete($id = null)
     {
+        $owner_id = $this->Auth->user()['id'];
         $this->request->allowMethod(['post', 'delete']);
         $friend = $this->Friends->get($id);
-        if ($this->Friends->delete($friend)) {
-            $this->Flash->success(__('The friend has been deleted.'));
-        } else {
-            $this->Flash->error(__('The friend could not be deleted. Please, try again.'));
+        if($friend->owner_id==$owner_id){
+            if ($this->Friends->delete($friend)) {
+                $this->Flash->success(__('The friend has been deleted.'));
+            } else {
+                $this->Flash->error(__('The friend could not be deleted. Please, try again.'));
+            }
+        }else{
+            $this->Flash->error(__('The friend could not be deleted. it is not yours.'));
         }
-
         return $this->redirect(['action' => 'index']);
     }
 }

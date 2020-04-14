@@ -4,6 +4,18 @@
  * @var \App\Model\Entity\User $user
  */
 ?>
+<nav class="large-3 medium-4 columns" id="actions-sidebar">
+    <ul class="side-nav">
+        <li class="heading"><?= __('Actions') ?></li>
+        <li><?= $this->Form->postLink(
+                __('フレンドリストに登録'),
+                ['controller' => 'Friends', 'action' => 'add', $user->id],
+                ['confirm' => __('Are you sure you want to add # {0}?', $user->handlename)]
+            )
+        ?></li>
+        <li><?= $this->Html->link(__('メイン画面'), ['controller'=>'Users', 'action' => 'index']) ?></li>
+    </ul>
+</nav>
 <div class="users view large-9 medium-8 columns content">
     <h3><?= h($user->handlename) ?></h3>
     <table class="vertical-table">

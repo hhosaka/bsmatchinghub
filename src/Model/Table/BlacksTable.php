@@ -37,11 +37,13 @@ class BlacksTable extends Table
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
 
-        $this->belongsTo('Users', [
+        $this->belongsTo('Owners', [
+            'className' => 'Users',
             'foreignKey' => 'owner_id',
             'joinType' => 'INNER',
         ]);
         $this->belongsTo('Users', [
+            'className' => 'Users',
             'foreignKey' => 'user_id',
             'joinType' => 'INNER',
         ]);
@@ -71,7 +73,7 @@ class BlacksTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        $rules->add($rules->existsIn(['owner_id'], 'Users'));
+        $rules->add($rules->existsIn(['owner_id'], 'Owners'));
         $rules->add($rules->existsIn(['user_id'], 'Users'));
 
         return $rules;

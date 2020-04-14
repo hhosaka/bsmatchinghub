@@ -13,10 +13,9 @@
                 ['confirm' => __('Are you sure you want to delete # {0}?', $user->id)]
             )
         ?></li>
-        <!--
-            <li><?= $this->Html->link(__('List Blacks'), ['controller' => 'Blacks', 'action' => 'index']) ?></li>
-            <li><?= $this->Html->link(__('New Black'), ['controller' => 'Blacks', 'action' => 'add']) ?></li>
-        -->
+        <li><?= $this->Html->link(__('フレンドリスト'), ['controller' => 'Friends', 'action' => 'index']) ?></li>
+        <li><?= $this->Html->link(__('ブラックリスト'), ['controller' => 'Blacks', 'action' => 'index']) ?></li>
+        <li><?= $this->Html->link(__('メイン画面'), ['controller' => 'Users', 'action' => 'index']) ?></li>
     </ul>
 </nav>
 <div class="users form large-9 medium-8 columns content">
@@ -35,17 +34,18 @@
     </fieldset>
     <?= $this->Form->button(__('送信')) ?>
     <?= $this->Form->end() ?>
+    <!--
     <div class="related">
         <h4><?= __('Friends') ?></h4>
-        <?php if (!empty($user->Friends)): ?>
+        <?php if (!empty($user->friends)): ?>
         <table cellpadding="0" cellspacing="0">
             <tr>
                 <th scope="col"><?= __('User Id') ?></th>
                 <th scope="col" class="actions"><?= __('Actions') ?></th>
             </tr>
-            <?php foreach ($user->Frineds as $friends): ?>
+            <?php foreach ($user->friends as $friends): ?>
             <tr>
-                <td><?= h($friends->user_id) ?></td>
+                <td><?= h($friends->user->handlename) ?></td>
                 <td class="actions">
                     <?= $this->Form->postLink(__('Delete'), ['controller' => 'Friends', 'action' => 'delete', $friends->id], ['confirm' => __('Are you sure you want to delete # {0}?', $friends->id)]) ?>
                 </td>
@@ -54,5 +54,6 @@
         </table>
         <?php endif; ?>
     </div>
+    -->
 
 </div>

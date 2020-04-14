@@ -15,15 +15,20 @@ use Cake\Auth\DefaultPasswordHasher;
  * @property string $status
  * @property \Cake\I18n\FrozenTime $start_time
  * @property \Cake\I18n\FrozenTime $end_time
- * @property string $list_mode
+ * @property bool $accept
  * @property string $skype_account
  * @property string|null $twitter_account
  * @property string|null $twitter_handle_name
  * @property string $comment
+ * @property string $short_comment
+ * @property string $keyword
+ * @property string $search_keyword
+ * @property bool $use_friends
  * @property \Cake\I18n\FrozenTime $creation_date
  * @property \Cake\I18n\FrozenTime $modification_date
  *
  * @property \App\Model\Entity\Black[] $blacks
+ * @property \App\Model\Entity\Friend[] $friends
  */
 class User extends Entity
 {
@@ -52,10 +57,11 @@ class User extends Entity
         'short_comment' => true,
         'keyword' => true,
         'search_keyword' => true,
-        'use_freinds' => true,
+        'use_friends' => true,
         'creation_date' => true,
         'modification_date' => true,
         'blacks' => true,
+        'friends' => true,
     ];
 
     /**

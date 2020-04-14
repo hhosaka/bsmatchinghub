@@ -10,6 +10,7 @@ use Cake\Validation\Validator;
  * Users Model
  *
  * @property \App\Model\Table\BlacksTable&\Cake\ORM\Association\HasMany $Blacks
+ * @property \App\Model\Table\FriendsTable&\Cake\ORM\Association\HasMany $Friends
  *
  * @method \App\Model\Entity\User get($primaryKey, $options = [])
  * @method \App\Model\Entity\User newEntity($data = null, array $options = [])
@@ -53,6 +54,10 @@ class UsersTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
+            ->integer('id')
+            ->allowEmptyString('id', null, 'create');
+
+        $validator
             ->scalar('username')
             ->maxLength('username', 128)
             ->requirePresence('username', 'create')
@@ -78,20 +83,21 @@ class UsersTable extends Table
 
         $validator
             ->scalar('status')
-            ->maxLength('status', 32)
             ->notEmptyString('status');
 
         $validator
-            ->dateTime('start_time');
+            ->dateTime('start_time')
+            ->notEmptyDateTime('start_time');
 
         $validator
-            ->dateTime('end_time');
+            ->dateTime('end_time')
+            ->notEmptyDateTime('end_time');
 
         $validator
             ->boolean('accept')
             ->requirePresence('accept', 'create');
 
-            $validator
+        $validator
             ->scalar('skype_account')
             ->maxLength('skype_account', 128)
             ->requirePresence('skype_account', 'create')
