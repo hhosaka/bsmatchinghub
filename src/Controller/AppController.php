@@ -62,7 +62,7 @@ class AppController extends Controller
             ],
             'logoutRedirect' => [
                 'controller' => 'Users',
-                'action' => 'index',
+                'action' => 'login',
             ],
             'authError' => 'ログインされていないか、権限がありません。権限のあるアカウントでログインしてください。(ERROR001)'
         ]);

@@ -31,13 +31,13 @@ class UsersController extends AppController
     public function beforeFilter(Event $event)
     {
         parent::beforeFilter($event);
-        $this->Auth->allow(['entry', 'tos', 'logout']);
+        $this->Auth->allow(['entry', 'tos','logout']);
     }
 
     public function isAuthorized($user = null)
     {
         $action = $this->request->getParam('action');
-        if(in_array($action,['index','activate','deactivate','settings','chat','viewUser'])){
+        if(in_array($action,['index','activate','deactivate','settings','chat','view'])){
                 return true;
         }
         return parent::isAuthorized($user);
@@ -157,13 +157,6 @@ class UsersController extends AppController
         $this->set(compact('user', 'users'));
     }
 
-    public function admin()
-    {
-        $users = $this->paginate($this->Users);
-
-        $this->set(compact('users'));
-    }
-
     /**
      * View method
      *
@@ -183,55 +176,6 @@ class UsersController extends AppController
         $this->set('user', $user);
     }
 
-    public function viewUser($id = null)
-    {
-        $this->view($id);
-    }
-
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
-     */
-    public function add()
-    {
-        $user = $this->Users->newEntity();
-        if ($this->request->is('post')) {
-            $user = $this->Users->patchEntity($user, $this->request->getData());
-            if ($this->Users->save($user)) {
-                $this->Flash->success(__('The user has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The user could not be saved. Please, try again.'));
-        }
-        $this->set(compact('user'));
-    }
-
-    /**
-     * Edit method
-     *
-     * @param string|null $id User id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null, $keyword = null)
-    {
-        $user = $this->Users->get($id, [
-            'contain' => ['Friends'=>['Users']],
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $user = $this->Users->patchEntity($user, $this->request->getData());
-            if ($this->Users->save($user)) {
-                $this->Flash->success(__('The user has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The user could not be saved. Please, try again.'));
-        }
-        $this->set(compact('user'));
-    }
-
     private function postTweet($message){
         $consumerKey       = "Yh0Z8XBVp7jy617X6xo5o0QGr";
         $consumerSecret    = "4GhXiyGaIuxTbwEaey3jp8d7APb7DvIVy9LlKHN2YX5gSVoJXQ";
@@ -248,6 +192,23 @@ class UsersController extends AppController
         // TODO
     }
 
+    private function edit($id = null)
+    {
+        $user = $this->Users->get($id, [
+            'contain' => ['Friends'=>['Users']],
+        ]);
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $user = $this->Users->patchEntity($user, $this->request->getData());
+            if ($this->Users->save($user)) {
+                $this->Flash->success(__('The user has been saved.'));
+
+                return $this->redirect(['action' => 'index']);
+            }
+            $this->Flash->error(__('The user could not be saved. Please, try again.'));
+        }
+        $this->set(compact('user'));
+    }
+    
     public function settings()
     {
         $this->edit($this->Auth->user()['id']);
@@ -287,6 +248,7 @@ class UsersController extends AppController
         $user = $this->Users->get($this->Auth->user()['id']);
         $user['status'] = 'INACTIVE';
         $this->Users->save($user);
+        $this->Flash->success(__('Deactivated.'));
         return $this->redirect(['action' => 'index']);
     }
     /**
@@ -296,7 +258,7 @@ class UsersController extends AppController
      * @return \Cake\Http\Response|null Redirects to index.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function delete($id = null)
+    public function delete($id)
     {
         $user = $this->Auth->user();
         if($user['role']=='admin'){

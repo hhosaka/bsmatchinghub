@@ -37,7 +37,7 @@
                 <td><?= h($user->end_time) ?></td>
                 <td><?= h($user->comment) ?></td>
                 <td class="actions">
-                    <?= $this->Html->link(__('詳細'), ['action' => 'viewUser', $user->id]) ?>
+                    <?= $this->Html->link(__('詳細'), ['action' => 'view', $user->id]) ?>
                     <?= $this->Html->link(__('チャット'), ['action' => 'chat', $user->id]) ?>
                 </td>
             </tr>
