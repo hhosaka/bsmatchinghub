@@ -12,6 +12,11 @@ use App\Controller\AppController;
  */
 class BlacksController extends AppController
 {
+    public function isAuthorized($user = null)
+    {
+        return true;
+    }
+
     /**
      * Index method
      *
@@ -22,25 +27,9 @@ class BlacksController extends AppController
         $this->paginate = [
             'contain' => [ 'Users'],
         ];
-        $blacks = $this->paginate($this->Blacks);
+        $blacks = $this->paginate($this->Blacks->findByOwnerId($this->Auth->user()['id']));
 
         $this->set(compact('blacks'));
-    }
-
-    /**
-     * View method
-     *
-     * @param string|null $id Black id.
-     * @return \Cake\Http\Response|null
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function view($id = null)
-    {
-        $black = $this->Blacks->get($id, [
-            'contain' => [ 'Users'],
-        ]);
-
-        $this->set('black', $black);
     }
 
     /**
@@ -48,47 +37,22 @@ class BlacksController extends AppController
      *
      * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
      */
-    public function add()
+    public function add($userid)
     {
-        $black = $this->Blacks->newEntity();
-        if ($this->request->is('post')) {
-            $black = $this->Blacks->patchEntity($black, $this->request->getData());
+        $ownerid = $this->Auth->user()['id'];
+        if(!$this->Blacks->exists(['owner_id'=>$ownerid, 'user_id'=>$userid])){
+            $black = $this->Blacks->newEntity();
+            $black['owner_id'] = $ownerid;
+            $black['user_id'] = $userid;
+    
             if ($this->Blacks->save($black)) {
                 $this->Flash->success(__('The black has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The black could not be saved. Please, try again.'));
-        }
-        $owners = $this->Blacks->Users->find('list', ['limit' => 200]);
-        $users = $this->Blacks->Users->find('list', ['limit' => 200]);
-        $this->set(compact('black', 'owners', 'users'));
-    }
-
-    /**
-     * Edit method
-     *
-     * @param string|null $id Black id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $black = $this->Blacks->get($id, [
-            'contain' => [],
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $black = $this->Blacks->patchEntity($black, $this->request->getData());
-            if ($this->Blacks->save($black)) {
-                $this->Flash->success(__('The black has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
+            else{
+                $this->Flash->error(__('The black could not be saved. Please, try again.'));
             }
-            $this->Flash->error(__('The black could not be saved. Please, try again.'));
         }
-        $owners = $this->Blacks->Owners->find('list', ['limit' => 200]);
-        $users = $this->Blacks->Users->find('list', ['limit' => 200]);
-        $this->set(compact('black', 'owners', 'users'));
+        $this->redirect($this->request->referer());
     }
 
     /**
@@ -98,16 +62,20 @@ class BlacksController extends AppController
      * @return \Cake\Http\Response|null Redirects to index.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function delete($id = null)
+    public function delete($id)
     {
+        $owner_id = $this->Auth->user()['id'];
         $this->request->allowMethod(['post', 'delete']);
         $black = $this->Blacks->get($id);
-        if ($this->Blacks->delete($black)) {
-            $this->Flash->success(__('The black has been deleted.'));
-        } else {
-            $this->Flash->error(__('The black could not be deleted. Please, try again.'));
+        if($black->owner_id==$owner_id){
+            if ($this->Blacks->delete($black)) {
+                $this->Flash->success(__('The black has been deleted.'));
+            } else {
+                $this->Flash->error(__('The black could not be deleted. Please, try again.'));
+            }
+        }else{
+            $this->Flash->error(__('The black could not be deleted. it is not yours.'));
         }
-
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect($this->request->referer());
     }
 }

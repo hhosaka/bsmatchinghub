@@ -10,7 +10,13 @@
         <li><?= $this->Form->postLink(
                 __('フレンドリストに登録'),
                 ['controller' => 'Friends', 'action' => 'add', $user->id],
-                ['confirm' => __('Are you sure you want to add # {0}?', $user->handlename)]
+                ['confirm' => __('Are you sure you want to add # {0} to Friend?', $user->handlename)]
+            )
+        ?></li>
+        <li><?= $this->Form->postLink(
+                __('ブラックリストに登録'),
+                ['controller' => 'Blacks', 'action' => 'add', $user->id],
+                ['confirm' => __('Are you sure you want to add # {0} to Black list?', $user->handlename)]
             )
         ?></li>
         <li><?= $this->Html->link(__('メイン画面'), ['controller'=>'Users', 'action' => 'index']) ?></li>

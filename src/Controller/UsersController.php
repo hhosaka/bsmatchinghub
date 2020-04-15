@@ -154,7 +154,6 @@ class UsersController extends AppController
 
         $users = $this->paginate($query);
 
-        var_dump($user);
         $this->set(compact('user', 'users'));
     }
 

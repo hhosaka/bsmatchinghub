@@ -62,7 +62,7 @@ class FriendsController extends AppController
      * @return \Cake\Http\Response|null Redirects to index.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function delete($id = null)
+    public function delete($id)
     {
         $owner_id = $this->Auth->user()['id'];
         $this->request->allowMethod(['post', 'delete']);
@@ -76,6 +76,6 @@ class FriendsController extends AppController
         }else{
             $this->Flash->error(__('The friend could not be deleted. it is not yours.'));
         }
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect($this->request->referer());
     }
 }

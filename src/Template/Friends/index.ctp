@@ -16,7 +16,7 @@
         <thead>
             <tr>
                 <th scope="col"><?= $this->Paginator->sort('user_id') ?></th>
-                <th scope="col" class="actions"><?= __('Actions') ?></th>
+                <th scope="col" width="15%" class="actions"><?= __('Actions') ?></th>
             </tr>
         </thead>
         <tbody>
