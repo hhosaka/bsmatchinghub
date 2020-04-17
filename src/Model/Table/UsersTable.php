@@ -38,11 +38,11 @@ class UsersTable extends Table
         $this->setPrimaryKey('id');
 
         $this->hasMany('Blacks', [
-            'foreignKey' => 'user_id',
+            'foreignKey' => 'owner_id',
         ]);
-        $this->hasMany('Friends', [
-            'foreignKey' => 'user_id',
-        ]);
+        // $this->hasMany('Friends', [
+        //     'foreignKey' => 'owner_id',
+        // ]);
     }
 
     /**

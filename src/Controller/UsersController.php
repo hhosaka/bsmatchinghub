@@ -138,19 +138,25 @@ class UsersController extends AppController
     {
         $user = $this->Users->findById($this->Auth->user()['id'])->first();
 
-        $conds[]=['id !='=>$user['id']];
-        $conds[]=['status'=>'active'];
-        $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime('+60 minute'))];
-        $conds[]=['end_time >='=> date("Y/m/d H:i:s")];
+        $conds[]=['Users.id !='=>$user['id']];// 本人は除く
+        $conds[]=['status'=>'active']; // アクティブのみ
+        $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime('+60 minute'))];// 開始一時間前まで
+        $conds[]=['end_time >='=> date("Y/m/d H:i:s")];//　終了したものは除く
         if($this->request->is('post')){
-            $keywords = $this->request->getData()['search_keyword'];
+            $keywords = $this->request->getData()['search_keyword'];// 画面で設定された検索ワード
             $user['search_keyword'] = $keywords;
         }else{
-            $keywords = $user['keyword'];
+            $keywords = $user['keyword'];// 定義された検索ワード
         }
         $conds = array_merge($conds, $this->convStr2Conds($keywords));
 
-        $query = $this->Users->find('all',['conditions'=>['and'=>[$conds]]]);
+        $query = $this->Users
+            ->find('all',[
+                'fields'=>['Users.id','Blacks.id','handlename','start_time','end_time','comment'],
+                'conditions'=>['and'=>[$conds]]])
+            ->leftJoinWith('Blacks')
+            ->group('Users.id')
+            ->having(['COUNT(Blacks.id)'=>'0']);
 
         $users = $this->paginate($query);
 
