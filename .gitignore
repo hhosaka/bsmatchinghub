@@ -2,6 +2,7 @@
 
 /vendor/*
 /config/app.php
+/config/bootstrap_keys.php
 
 /tmp/*
 /tmp/cache/models/*

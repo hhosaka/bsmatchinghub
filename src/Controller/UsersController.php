@@ -183,10 +183,10 @@ class UsersController extends AppController
     }
 
     private function postTweet($message){
-        $consumerKey       = "Yh0Z8XBVp7jy617X6xo5o0QGr";
-        $consumerSecret    = "4GhXiyGaIuxTbwEaey3jp8d7APb7DvIVy9LlKHN2YX5gSVoJXQ";
-        $accessToken       = "1007261840940777472-DfOwsrO2xRWcacvT6TFckefjaLI8EG";
-        $accessTokenSecret = "TI2KSQy1XJ7Y1e95V8d8caYL73QuDAw8BCFh6Yni6xkbh";
+        $consumerKey       = TW_CONSUMER_KEY;
+        $consumerSecret    = TW_CONSUMER_SECRET_KEY;
+        $accessToken       = TW_ACCESS_TOKEN;
+        $accessTokenSecret = TW_ACCESS_SECRET_TOKEN;
         
         $twitter = new TwitterOAuth($consumerKey, $consumerSecret, $accessToken, $accessTokenSecret);
 

@@ -202,8 +202,4 @@ Type::build('timestamp')
 //Inflector::rules('uninflected', ['dontinflectme']);
 //Inflector::rules('transliteration', ['/å/' => 'aa']);
 
-define('SEND_MAIL', false);
-define('TEMPLATE_FOLDER_MAIL', './template/mail/');
-define('SYSTEM_MAIL_NAME', 'Studio Plumbline');
-define('SYSTEM_MAIL_ADDRESS', 'manager@plumbline.xsrv.jp');
-define('OWNER_MAIL_ADDRESS', 'hhosaka183@gmail.com');
+require __DIR__ . '/bootstrap_keys.php';
