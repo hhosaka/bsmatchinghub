@@ -37,7 +37,7 @@ class UsersController extends AppController
     public function isAuthorized($user = null)
     {
         $action = $this->request->getParam('action');
-        if(in_array($action,['index','activate','deactivate','settings','chat','view'])){
+        if(in_array($action,['index','activate','deactivate','settings','requestMatch','view'])){
                 return true;
         }
         return parent::isAuthorized($user);
@@ -152,7 +152,7 @@ class UsersController extends AppController
             'contain' => ['Blacks','Friends'],
         ]);
 
-        $hide = $user['use_friends'] && (!in_array($targetid, array_column($user->friends,'user_id')));
+        $hide = $user['use_friends']!='FREE' && (!in_array($targetid, array_column($user->friends,'user_id')));
 
         if($hide){
             $user['username'] = '***';
@@ -224,9 +224,18 @@ class UsersController extends AppController
         $this->postTweet($message);
     }
 
-    public function chat($id = null)
+    public function requestMatch($id = null)
     {
-        $this->sendMatchRequest($this->Auth->user(), $this->Users->get($id));
+        $target = $this->Users->get($id,['contain' => ['Friends']]);
+        $user = $this->Auth->user();
+        $this->log($target);
+        $this->log($user);
+        if($target['use_friends']!='CLOSE' || (in_array($user['id'], array_column($target->friends,'user_id')))){
+            $this->sendMatchRequest($this->Auth->user(), $this->Users->get($id));
+        }
+        else{
+            $this->Flash->error(__($target['handlename'].'さんのフレンドに登録されていません。'));
+        }
         return $this->redirect($this->request->referer());
     }
 
