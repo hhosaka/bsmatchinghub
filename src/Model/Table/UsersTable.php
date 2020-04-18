@@ -40,9 +40,10 @@ class UsersTable extends Table
         $this->hasMany('Blacks', [
             'foreignKey' => 'owner_id',
         ]);
-        // $this->hasMany('Friends', [
-        //     'foreignKey' => 'owner_id',
-        // ]);
+        
+        $this->hasMany('Friends', [
+            'foreignKey' => 'owner_id',
+        ]);
     }
 
     /**

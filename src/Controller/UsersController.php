@@ -92,10 +92,6 @@ class UsersController extends AppController
         $this->set(compact('user'));
     }
 
-    public function getStatus($user){
-        return $user['status'];
-    }
-
     public function tos(){
 
     }
@@ -105,28 +101,6 @@ class UsersController extends AppController
             $conds[] = ['keyword LIKE'=>'%'.$keyword.'%'];
         }
         return $conds;
-    }
-
-    private function convFlags2Conds($flags){
-        $conds = null;
-        if($flags['keyword00']) $conds[]=['keyword LIKE'=>'%競技志向%'];
-        if($flags['keyword01']) $conds[]=['keyword LIKE'=>'%ショップ大会%'];
-        if($flags['keyword02']) $conds[]=['keyword LIKE'=>'%フリー対戦%'];
-        if($flags['keyword03']) $conds[]=['keyword LIKE'=>'%調整%'];
-        if($flags['keyword06']) $conds[]=['keyword LIKE'=>'%連戦%'];
-        if($flags['keyword07']) $conds[]=['keyword LIKE'=>'%一本勝負%'];
-        return $conds;
-    }
-
-    private function convFlags2Keyword($flags){
-        $keyword = "";
-        if($flags['keyword00']) $keyword=$keyword.'競技志向';
-        if($flags['keyword01']) $keyword=$keyword.'ショップ大会';
-        if($flags['keyword02']) $keyword=$keyword.'フリー対戦';
-        if($flags['keyword03']) $keyword=$keyword.'調整';
-        if($flags['keyword06']) $keyword=$keyword.'連戦';
-        if($flags['keyword07']) $keyword=$keyword.'一本勝負';
-        return $keyword;
     }
 
     /**
@@ -172,30 +146,70 @@ class UsersController extends AppController
      */
     public function view($id = null)
     {
+        $targetid = $this->Auth->user()['id'];
+        
         $user = $this->Users->get($id, [
             'contain' => ['Blacks','Friends'],
         ]);
 
+        $hide = $user['use_friends'] && (!in_array($targetid, array_column($user->friends,'user_id')));
+
+        if($hide){
+            $user['username'] = '***';
+            $user['skype_account'] = '***';
+            $user['twitter_account'] = '***';
+            $user['twitter_handle_name'] = '***';
+        }
+
         $this->pagenate = [
             'contain' => ['Blacks','Friends'],
         ];
-        $this->set('user', $user);
+
+        $this->set(compact('user', 'hide'));
     }
 
-    private function postTweet($message){
+    private function createTwitterOAuth(){
         $consumerKey       = TW_CONSUMER_KEY;
         $consumerSecret    = TW_CONSUMER_SECRET_KEY;
         $accessToken       = TW_ACCESS_TOKEN;
         $accessTokenSecret = TW_ACCESS_SECRET_TOKEN;
         
-        $twitter = new TwitterOAuth($consumerKey, $consumerSecret, $accessToken, $accessTokenSecret);
+        return new TwitterOAuth($consumerKey, $consumerSecret, $accessToken, $accessTokenSecret);
+    }
 
-        $result = $twitter->post("statuses/update", ["status" => $message]);
+    private function sendDM($dmto, $message){
+        $response = $this->createTwitterOAuth()->post('direct_messages/events/new', ['screen_name' => $dmto, 'text' => "$message"]);
+        $this->log($response);
+    }
+
+    private function postTweet($message){
+        $this->createTwitterOAuth()->post("statuses/update", ["status" => $message]);
+    }
+
+    private function sendMatchRequest($sender, $target){
+
+        $message = $sender['handlename']."(@".$sender['twitter_account'].")さんから対戦のオファーがあります。\r\n";
+        $message = $message . "「". mb_substr($sender['comment'],0,64). "」\r\n";
+        $message = $message . "http://plumbline.xsrv.jp/bsmh/users";
+
+        $this->sendDM($target->twitter_account, $message);
+    }
+
+    private function postActivateMessage($user){
+        $message = $user['handlename'];
+        $message = $message . "さんが対戦希望しています。\r\n";
+        $message = $message . "開始時間". $user['start_time'] . "\r\n";
+        $message = $message . "終了時間". $user['end_time'] . "\r\n";
+        $message = $message . "「". mb_substr($user['comment'],0,64). "」\r\n";
+        $message = $message . "http://plumbline.xsrv.jp/bsmh/users";
+
+        $this->postTweet($message);
     }
 
     public function chat($id = null)
     {
-        // TODO
+        $this->sendMatchRequest($this->Auth->user(), $this->Users->get($id));
+        return $this->redirect($this->request->referer());
     }
 
     private function edit($id = null)
@@ -218,17 +232,6 @@ class UsersController extends AppController
     public function settings()
     {
         $this->edit($this->Auth->user()['id']);
-    }
-
-    private function postActivateMessage($user){
-        $message = $user['handlename'];
-        $message = $message . "さんが対戦希望しています。\r\n";
-        $message = $message . "開始時間". $user['start_time'] . "\r\n";
-        $message = $message . "終了時間". $user['end_time'] . "\r\n";
-        $message = $message . "「". mb_substr($user['comment'],0,64). "」\r\n";
-        $message = $message . "http://plumbline.xsrv.jp/bsmh/users";
-
-        $this->postTweet($message);
     }
 
     public function activate()

@@ -24,6 +24,7 @@
 </nav>
 <div class="users view large-9 medium-8 columns content">
     <h3><?= h($user->handlename) ?></h3>
+    <legend><?php if($hide) echo __('<<フレンド登録されるまで特定の情報は表示されません。>>'); ?></legend>
     <table class="vertical-table">
         <tr>
             <th scope="row"><?= __('Id') ?></th>

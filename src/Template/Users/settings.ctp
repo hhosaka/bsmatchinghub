@@ -30,9 +30,10 @@
             echo $this->Form->control('twitter_handle_name',['label'=>'Twitterのハンドルネーム']);
             echo $this->Form->control("keyword",['label'=>'キーワード']);
             echo $this->Form->control("search_keyword",['label'=>'検索キーワード']);
+            echo $this->Form->control("use_friends",['type'=>'checkbox', 'label'=>'フレンドにだけ情報公開']);
         ?>
     </fieldset>
-    <?= $this->Form->button(__('送信')) ?>
+    <?= $this->Form->button(__('保存')) ?>
     <?= $this->Form->end() ?>
     <!--
     <div class="related">

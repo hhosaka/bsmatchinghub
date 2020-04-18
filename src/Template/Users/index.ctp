@@ -38,7 +38,10 @@
                 <td><?= h($user->comment) ?></td>
                 <td class="actions">
                     <?= $this->Html->link(__('詳細'), ['action' => 'view', $user->id]) ?>
-                    <?= $this->Html->link(__('チャット'), ['action' => 'chat', $user->id]) ?>
+                    <?= $this->Html->link(__('リクエスト'), 
+                        ['action' => 'chat', $user->id],
+                        ['confirm' => __('Are you sure you want to send matching request to # {0}?', $user->handlename)]
+                    ) ?>
                 </td>
             </tr>
             <?php endforeach; ?>
