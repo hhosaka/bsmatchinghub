@@ -14,7 +14,9 @@
     </ul>
 </nav>
 <div class="users index large-9 medium-8 columns content">
-
+    <Legend>お知らせ</Legend>
+    <hr>
+    <?= $information ?>
     <table cellpadding="0" cellspacing="0">
         <thead>
             <tr>
@@ -58,7 +60,16 @@
         <p><?= $this->Paginator->counter(['format' => __('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')]) ?></p>
     </div>
 
-    <h3><?= __('検索条件') ?></h3>
+    <Legend><?= __('検索条件') ?></Legend>
+    <hr>
+    <?php
+        $buf = '＜＜検索条件は';
+        foreach ($conditions as $condition){
+        $buf = $buf.$condition.'|';
+    }
+    echo $buf.'を"|"でつないで指定してください。＞＞';
+    ?>
+
     <?=$this->Form->create() ?>
     <fieldset>
     <?=$this->Form->control('search_keyword',['label'=>'検索用キーワード','default'=>$user['search_keyword']]) ?>

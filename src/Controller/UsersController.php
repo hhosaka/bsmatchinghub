@@ -14,6 +14,9 @@ use Abraham\TwitterOAuth\TwitterOAuth;
  */
 class UsersController extends AppController
 {
+    private $information = '来週末、新弾発売記念大会を催します。乞うご期待。';// TODO
+    private $conditions = ['競技','ショップ大会','フリー対戦','調整','連戦','一本勝負'];
+
     public function initialize()
     {
         parent::initialize();
@@ -119,10 +122,9 @@ class UsersController extends AppController
         if($this->request->is('post')){
             $keywords = $this->request->getData()['search_keyword'];// 画面で設定された検索ワード
             $user['search_keyword'] = $keywords;
-        }else{
-            $keywords = $user['keyword'];// 定義された検索ワード
+            $this->Users->save($user);
         }
-        $conds = array_merge($conds, $this->convStr2Conds($keywords));
+        $conds = array_merge($conds, $this->convStr2Conds($user['search_keyword']));
 
         $query = $this->Users
             ->find('all',[
@@ -134,6 +136,8 @@ class UsersController extends AppController
 
         $users = $this->paginate($query);
 
+        $this->set('information', $this->information);
+        $this->set('conditions', $this->conditions);
         $this->set(compact('user', 'users'));
     }
 
@@ -208,6 +212,7 @@ class UsersController extends AppController
 
         $message = $sender['handlename']."(@".$sender['twitter_account'].")さんから対戦のオファーがあります。\r\n";
         $message = $message . "「". mb_substr($sender['comment'],0,64). "」\r\n";
+        $message = $message . "Skype ID:". $sender['skype_account']."\r\n";
         $message = $message . "http://plumbline.xsrv.jp/bsmh/users";
 
         $this->sendDM($target->twitter_account, $message);
