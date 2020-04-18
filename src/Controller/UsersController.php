@@ -178,12 +178,30 @@ class UsersController extends AppController
     }
 
     private function sendDM($dmto, $message){
-        $response = $this->createTwitterOAuth()->post('direct_messages/events/new', ['screen_name' => $dmto, 'text' => "$message"]);
-        $this->log($response);
+
+        $twitter = $this->createTwitterOAuth();
+        $userinfo = $twitter->get('users/show',['screen_name'=>'DDiamond6']);
+
+        $params = [
+            'event' => [
+                'type' => 'message_create',
+                'message_create' => [
+                    'target' => [
+                        'recipient_id' => $userinfo->id
+                    ],
+                    'message_data' => [
+                        "text" => $message
+                    ]
+                ]
+            ]
+        ];
+        $response = $twitter->post('direct_messages/events/new', $params, true);
+        //$this->log($response);
     }
 
     private function postTweet($message){
-        $this->createTwitterOAuth()->post("statuses/update", ["status" => $message]);
+        $response = $this->createTwitterOAuth()->post("statuses/update", ["status" => $message]);
+        //$this->log($response);
     }
 
     private function sendMatchRequest($sender, $target){
