@@ -70,7 +70,7 @@
         <?=$this->Form->control('keyword'.$i ,['type'=>'checkbox','label'=>$condition,'checked'=>$data['keyword'.$i]]); $i=$i+1 ?>
     <?php endforeach ?>
     </div>
-    <?=$this->Form->control('search_keyword',['label'=>'検索用キーワード','value'=>$data['search_keyword']]) ?>
+    <?=$this->Form->control('search_keyword',['label'=>'検索用キーワード("|"で複数条件を指定できます。)','value'=>$data['search_keyword']]) ?>
     </fieldset>
     <?=$this->Form->button("再検索")?>
     <?=$this->Form->end()?>

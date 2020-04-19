@@ -15,7 +15,7 @@ use Abraham\TwitterOAuth\TwitterOAuth;
 class UsersController extends AppController
 {
     private $information = '来週末、新弾発売記念大会を催します。乞うご期待。';// TODO
-    private $conditions = ['競技','ショップ大会','フリー対戦','調整','連戦','一本勝負'];
+    private $conditions = ['競技','ショップ大会','フリー対戦','調整','連戦','一本勝負','Skype初心者','BSMH杯'];
 
     public function initialize()
     {
@@ -120,8 +120,10 @@ class UsersController extends AppController
 
         $buf['search_keyword'] = "";
         foreach(explode("|", $search_keywords) as $keyword){
-            if(!in_array($keyword, $keywords)){
-                $buf['search_keyword'].='|'.$keyword;
+            if($keyword!=""){
+                if(!in_array($keyword, $keywords)){
+                    $buf['search_keyword'].='|'.$keyword;
+                }
             }
         }
         return $buf;
@@ -171,7 +173,7 @@ class UsersController extends AppController
 
         $users = $this->paginate($query);
 
-        $this->set('information', $this->information);
+        $this->set('information', $this->getUserInfo('BSMatchingHub')->description);
         $this->set('conditions', $this->conditions);
         $data = $this->unpackKeywords($user['search_keyword']);
         $this->set(compact('user', 'users','data'));
@@ -217,10 +219,15 @@ class UsersController extends AppController
         return new TwitterOAuth($consumerKey, $consumerSecret, $accessToken, $accessTokenSecret);
     }
 
+    private function getUserInfo($account){
+        $twitter = $this->createTwitterOAuth();
+        return $twitter->get('users/show',['screen_name'=>$account]);
+    }
+
     private function sendDM($dmto, $message){
 
         $twitter = $this->createTwitterOAuth();
-        $userinfo = $twitter->get('users/show',['screen_name'=>'DDiamond6']);
+        $userinfo = $twitter->get('users/show',['screen_name'=>$dmto]);
 
         $params = [
             'event' => [
