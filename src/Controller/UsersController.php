@@ -118,21 +118,21 @@ class UsersController extends AppController
             }
         }
 
-        $buf['search_keyword'] = "";
+        $buf['others'] = "";
         foreach(explode("|", $search_keywords) as $keyword){
             if($keyword!=""){
                 if(!in_array($keyword, $keywords)){
-                    $buf['search_keyword'].='|'.$keyword;
+                    $buf['others'].='|'.$keyword;
                 }
             }
         }
         return $buf;
     }
 
-    private function packKeyword($data){
+    private function packKeyword($data, $others){
         $keywords = $this->conditions;
         $count = count($keywords);
-        $buf = $data['search_keyword'];
+        $buf = $others;
         for($i=0;$i<$count;++$i){
             if($data['keyword'.$i]){
                 $keyword = $keywords[$i];
@@ -158,7 +158,8 @@ class UsersController extends AppController
         $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime('+60 minute'))];// 開始一時間前まで
         $conds[]=['end_time >='=> date("Y/m/d H:i:s")];//　終了したものは除く
         if($this->request->is('post')){
-            $user['search_keyword'] = $this->packKeyword($this->request->getData());
+            $data = $this->request->getData();
+            $user['search_keyword'] = $this->packKeyword($data, $data['others']);
             $this->Users->save($user);
         }
         $conds = array_merge($conds, $this->convStr2Conds($user['search_keyword']));
@@ -287,13 +288,17 @@ class UsersController extends AppController
         return $this->redirect($this->request->referer());
     }
 
-    private function edit($id = null)
+    public function settings()
     {
+        $id = $this->Auth->user()['id'];
         $user = $this->Users->get($id, [
             'contain' => ['Friends'=>['Users']],
         ]);
+
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $user = $this->Users->patchEntity($user, $this->request->getData());
+            $data = $this->request->getData();
+            $user = $this->Users->patchEntity($user, $data);
+            $user['keyword'] = $this->packKeyword($data,$data['others']);
             if ($this->Users->save($user)) {
                 $this->Flash->success(__('The user has been saved.'));
 
@@ -301,12 +306,10 @@ class UsersController extends AppController
             }
             $this->Flash->error(__('The user could not be saved. Please, try again.'));
         }
+
+        $this->set('keywords', $this->conditions);
+        $this->set('data',$this->unpackKeywords($user['keyword']));
         $this->set(compact('user'));
-    }
-    
-    public function settings()
-    {
-        $this->edit($this->Auth->user()['id']);
     }
 
     public function activate()

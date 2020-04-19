@@ -28,8 +28,6 @@
             echo $this->Form->control('skype_account',['label'=>'Skype ID']);
             echo $this->Form->control('twitter_account',['label'=>'Twitter ID']);
             echo $this->Form->control('twitter_handle_name',['label'=>'Twitterのハンドルネーム']);
-            echo $this->Form->control("keyword",['label'=>'キーワード']);
-            echo $this->Form->control("search_keyword",['label'=>'検索キーワード']);
             echo $this->Form->control('use_friends',[
                 'label'=>'フレンド設定',
                 'type'=>'select',
@@ -39,8 +37,14 @@
                     'OPEN'=>'フレンドにだけ情報公開(OPEN)',
                     'CLOSE'=>'フレンドのみ(CLOSE)']
                 ]);
-
+            
         ?>
+        <?= $this->Form->control('others', ['label'=>'キーワード("|"で複数条件を指定できます。)','value'=>$data['others']]);?>
+        <div style="display:inline-flex">
+        <?php $i=0; foreach ($keywords as $keyword):?>
+            <?=$this->Form->control('keyword'.$i, ['type'=>'checkbox','label'=>$keyword,'checked'=>$data['keyword'.$i]]); $i=$i+1 ?>
+        <?php endforeach ?>
+        </div>
     </fieldset>
     <?= $this->Form->button(__('保存')) ?>
     <?= $this->Form->end() ?>
