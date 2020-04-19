@@ -106,6 +106,42 @@ class UsersController extends AppController
         return $conds;
     }
 
+    private function unpackKeywords($search_keywords){
+        $keywords = $this->conditions;
+        $count = count($keywords);
+        $buf = null;
+        for($i=0; $i<$count; ++$i){
+            if(strpos($search_keywords, $keywords[$i])!==false){
+                $buf['keyword'.$i] =  '1';
+            }else{
+                $buf['keyword'.$i] =  '0';
+            }
+        }
+
+        $buf['search_keyword'] = "";
+        foreach(explode("|", $search_keywords) as $keyword){
+            if(!in_array($keyword, $keywords)){
+                $buf['search_keyword'].='|'.$keyword;
+            }
+        }
+        return $buf;
+    }
+
+    private function packKeyword($data){
+        $keywords = $this->conditions;
+        $count = count($keywords);
+        $buf = $data['search_keyword'];
+        for($i=0;$i<$count;++$i){
+            if($data['keyword'.$i]){
+                $keyword = $keywords[$i];
+                if(strpos($buf, $keyword)==false){
+                    $buf .= '|'.$keyword;
+                }
+            }
+        }
+        return $buf;
+    }
+
     /**
      * Index method
      *
@@ -120,8 +156,7 @@ class UsersController extends AppController
         $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime('+60 minute'))];// 開始一時間前まで
         $conds[]=['end_time >='=> date("Y/m/d H:i:s")];//　終了したものは除く
         if($this->request->is('post')){
-            $keywords = $this->request->getData()['search_keyword'];// 画面で設定された検索ワード
-            $user['search_keyword'] = $keywords;
+            $user['search_keyword'] = $this->packKeyword($this->request->getData());
             $this->Users->save($user);
         }
         $conds = array_merge($conds, $this->convStr2Conds($user['search_keyword']));
@@ -138,7 +173,8 @@ class UsersController extends AppController
 
         $this->set('information', $this->information);
         $this->set('conditions', $this->conditions);
-        $this->set(compact('user', 'users'));
+        $data = $this->unpackKeywords($user['search_keyword']);
+        $this->set(compact('user', 'users','data'));
     }
 
     /**

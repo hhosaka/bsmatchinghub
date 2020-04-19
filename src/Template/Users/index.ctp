@@ -62,17 +62,15 @@
 
     <Legend><?= __('検索条件') ?></Legend>
     <hr>
-    <?php
-        $buf = '＜＜検索条件は';
-        foreach ($conditions as $condition){
-        $buf = $buf.$condition.'|';
-    }
-    echo $buf.'を"|"でつないで指定してください。＞＞';
-    ?>
 
     <?=$this->Form->create() ?>
     <fieldset>
-    <?=$this->Form->control('search_keyword',['label'=>'検索用キーワード','default'=>$user['search_keyword']]) ?>
+    <div style="display:inline-flex">
+    <?php $i=0; foreach ($conditions as $condition):?>
+        <?=$this->Form->control('keyword'.$i ,['type'=>'checkbox','label'=>$condition,'checked'=>$data['keyword'.$i]]); $i=$i+1 ?>
+    <?php endforeach ?>
+    </div>
+    <?=$this->Form->control('search_keyword',['label'=>'検索用キーワード','value'=>$data['search_keyword']]) ?>
     </fieldset>
     <?=$this->Form->button("再検索")?>
     <?=$this->Form->end()?>
