@@ -256,10 +256,10 @@ class UsersController extends AppController
 
     private function sendMatchRequest($sender, $target){
 
-        $message = $sender['handlename']."(@".$sender['twitter_account'].")さんから対戦のオファーがあります。\r\n";
+        $message = $sender['handlename']."(@".$sender['twitter_account'].")さんから対戦のお誘いがあります。\r\n";
         $message = $message . "「". mb_substr($sender['comment'],0,64). "」\r\n";
         $message = $message . "Skype ID:". $sender['skype_account']."\r\n";
-        $message = $message . "http://plumbline.xsrv.jp/bsmh/users";
+        $message = $message . "対戦希望終了はこちらから >　http://plumbline.xsrv.jp/bsmh/users/deactivate";
 
         $this->sendDM($target->twitter_account, $message);
     }
