@@ -155,13 +155,15 @@ class UsersController extends AppController
 
         $conds[]=['Users.id !='=>$user['id']];// 本人は除く
         $conds[]=['status'=>'active']; // アクティブのみ
-        $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime('+60 minute'))];// 開始一時間前まで
         $conds[]=['end_time >='=> date("Y/m/d H:i:s")];//　終了したものは除く
+        $leadtime = '+60 minute';// 開始一時間前まで
         if($this->request->is('post')){
             $data = $this->request->getData();
+            $leadtime = $data['leadtime'];
             $user['search_keyword'] = $this->packKeyword($data, $data['others']);
             $this->Users->save($user);
         }
+        $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime($leadtime))];
         $conds = array_merge($conds, $this->convStr2Conds($user['search_keyword']));
 
         $query = $this->Users

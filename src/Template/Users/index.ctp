@@ -67,6 +67,17 @@
 
     <?=$this->Form->create() ?>
     <fieldset>
+    <?=$this->Form->control('leadtime',[
+                'label'=>'リードタイム',
+                'type'=>'select',
+                'default'=>'+60 minute',
+                'options'=>[
+                    'now'=>'現在',
+                    '+60 minute'=>'１時間後まで含める',
+                    '+120 minute'=>'2時間後まで含める',
+                    '+180 minute'=>'3時間後まで含める',
+                    '+1 day'=>'一日後まで含める',]
+                ]);?>
     <?=$this->Form->control('others',['label'=>'検索用キーワード("|"で複数条件を指定できます。)','value'=>$data['others']]) ?>
     <div style="display:inline-flex">
     <?php $i=0; foreach ($conditions as $condition):?>
