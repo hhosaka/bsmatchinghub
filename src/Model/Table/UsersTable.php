@@ -133,7 +133,8 @@ class UsersTable extends Table
             ->allowEmptyString('search_keyword');
 
         $validator
-            ->boolean('use_friends');
+            ->scalar('use_friends')
+            ->notEmptyString('use_friends');
 
         $validator
             ->dateTime('creation_date');
