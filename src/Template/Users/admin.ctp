@@ -7,24 +7,15 @@
 <nav class="large-3 medium-4 columns" id="actions-sidebar">
     <ul class="side-nav">
         <li class="heading"><?= __('Actions') ?></li>
-        <li><?= $this->Html->link(__('対戦希望開始'), ['action' => 'activate']) ?></li>
-        <li><?= $this->Html->link(__('対戦希望終了'), ['action' => 'deactivate']) ?></li>
-        <li><?= $this->Html->link(__('条件設定／ユーザー設定'), ['action' => 'settings']) ?></li>
         <li><?= $this->Html->link(__('ログアウト'), ['action' => 'logout']) ?></li>
     </ul>
 </nav>
 <div class="users index large-9 medium-8 columns content">
-    <Legend>お知らせ</Legend>
-    <hr>
-    <pre>
-    <?= $information ?>
-    </pre>
     <table cellpadding="0" cellspacing="0">
         <thead>
             <tr>
                 <th scope="col" width ="5%"><?= $this->Paginator->sort('id',['label'=>'ID']) ?></th>
                 <th scope="col" width ="15%"><?= $this->Paginator->sort('handlename',['label'=>'ハンドルネーム']) ?></th>
-                <th scope="col" width ="10%"><?= h('ステータス') ?></th>
                 <th scope="col" width ="15%"><?= $this->Paginator->sort('start_time',['label'=>'開始予定時間']) ?></th>
                 <th scope="col" width ="15%"><?= $this->Paginator->sort('end_time',['label'=>'終了予定時間']) ?></th>
                 <th scope="col"><?= $this->Paginator->sort('comment',['label'=>'コメント']) ?></th>
@@ -36,7 +27,6 @@
             <tr>
                 <td><?= $this->Number->format($user->id) ?></td>
                 <td><?= h($user->handlename) ?></td>
-                <td><?= strtotime($user->start_time) > time()?'READY':'ACTIVE' ?></td>
                 <td><?= h($user->start_time) ?></td>
                 <td><?= h($user->end_time) ?></td>
                 <td><?= h($user->comment) ?></td>
@@ -67,17 +57,6 @@
 
     <?=$this->Form->create() ?>
     <fieldset>
-    <?=$this->Form->control('leadtime',[
-                'label'=>'リードタイム',
-                'type'=>'select',
-                'default'=>'+60 minute',
-                'options'=>[
-                    'now'=>'現在',
-                    '+60 minute'=>'１時間後まで含める',
-                    '+120 minute'=>'2時間後まで含める',
-                    '+180 minute'=>'3時間後まで含める',
-                    '+1 day'=>'一日後まで含める',]
-                ]);?>
     <?=$this->Form->control('others',['label'=>'検索用キーワード("|"で複数条件を指定できます。)','value'=>$data['others']]) ?>
     <div style="display:inline-flex">
     <?php $i=0; foreach ($conditions as $condition):?>

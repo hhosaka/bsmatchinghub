@@ -144,11 +144,6 @@ class UsersController extends AppController
         return $buf;
     }
 
-    /**
-     * Index method
-     *
-     * @return \Cake\Http\Response|null
-     */
     public function index()
     {
         $user = $this->Users->findById($this->Auth->user()['id'])->first();
@@ -182,6 +177,30 @@ class UsersController extends AppController
         $this->set(compact('user', 'users','data'));
     }
 
+    public function admin()
+    {
+        $conds[]=['status'=>'active']; // アクティブのみ
+        $conds[]=['end_time >='=> date("Y/m/d H:i:s")];//　終了したものは除く
+        $search_keyword ='';
+        if($this->request->is('post')){
+            $data = $this->request->getData();
+            $search_keyword = $this->packKeyword($data, $data['others']);
+        }
+        $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime('now'))];
+        $conds = array_merge($conds, $this->convStr2Conds($search_keyword));
+
+        $query = $this->Users
+            ->find('all',[
+                'fields'=>['Users.id','handlename','start_time','end_time','comment'],
+                'conditions'=>['and'=>[$conds]]]);
+
+        $users = $this->paginate($query);
+
+        $this->set('conditions', $this->conditions);
+        $data = $this->unpackKeywords($search_keyword);
+        $this->set(compact('users','data'));
+    }
+
     /**
      * View method
      *
@@ -191,15 +210,14 @@ class UsersController extends AppController
      */
     public function view($id = null)
     {
-        $targetid = $this->Auth->user()['id'];
-        
+        $owner = $this->Auth->user();
         $user = $this->Users->get($id, [
             'contain' => ['Blacks','Friends'],
         ]);
 
-        $hide = $user['use_friends']!='FREE' && (!in_array($targetid, array_column($user->friends,'user_id')));
+        $hide = $user['use_friends']!='FREE' && (!in_array($owner['id'], array_column($user->friends,'user_id')));
 
-        if($hide){
+        if($owner['role']!='admin' && $hide){
             $user['username'] = '***';
             $user['skype_account'] = '***';
             $user['twitter_account'] = '***';
@@ -269,6 +287,7 @@ class UsersController extends AppController
         $message = $message . "さんが対戦希望しています。\r\n";
         $message = $message . "開始時間". $user['start_time'] . "\r\n";
         $message = $message . "終了時間". $user['end_time'] . "\r\n";
+        $message = $message . "キーワード：". mb_substr($user['keyword'],0,64). "\r\n";
         $message = $message . "「". mb_substr($user['comment'],0,64). "」\r\n";
         $message = $message . "http://plumbline.xsrv.jp/bsmh/users";
 
