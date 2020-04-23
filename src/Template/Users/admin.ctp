@@ -11,15 +11,16 @@
     </ul>
 </nav>
 <div class="users index large-9 medium-8 columns content">
+    <?='対象：'.$player->handlename?>
     <table cellpadding="0" cellspacing="0">
         <thead>
             <tr>
                 <th scope="col" width ="5%"><?= $this->Paginator->sort('id',['label'=>'ID']) ?></th>
                 <th scope="col" width ="15%"><?= $this->Paginator->sort('handlename',['label'=>'ハンドルネーム']) ?></th>
-                <th scope="col" width ="15%"><?= $this->Paginator->sort('start_time',['label'=>'開始予定時間']) ?></th>
+                <th scope="col" width ="15%"><?= $this->Paginator->sort('skype_account',['label'=>'Skype ID']) ?></th>
                 <th scope="col" width ="15%"><?= $this->Paginator->sort('end_time',['label'=>'終了予定時間']) ?></th>
                 <th scope="col"><?= $this->Paginator->sort('comment',['label'=>'コメント']) ?></th>
-                <th scope="col" width ="15%" class="actions"><?= __('Actions') ?></th>
+                <th scope="col" width ="20%" class="actions"><?= __('Actions') ?></th>
             </tr>
         </thead>
         <tbody>
@@ -27,15 +28,13 @@
             <tr>
                 <td><?= $this->Number->format($user->id) ?></td>
                 <td><?= h($user->handlename) ?></td>
-                <td><?= h($user->start_time) ?></td>
+                <td><?= h($user->skype_account) ?></td>
                 <td><?= h($user->end_time) ?></td>
                 <td><?= h($user->comment) ?></td>
                 <td class="actions">
                     <?= $this->Html->link(__('[詳細]'), ['action' => 'view', $user->id]) ?>
-                    <?= $this->Html->link(__('[対戦リクエスト]'), 
-                        ['action' => 'requestMatch', $user->id],
-                        ['confirm' => __('Are you sure you want to send matching request to # {0}?', $user->handlename)]
-                    ) ?>
+                    <?= $this->Html->link(__('[対象]'), ['action' => 'admin', $user->id]) ?>
+                    <?= $this->Html->link(__('[案内]'), ['action' => 'offer', $player->id, $user->id]) ?>
                 </td>
             </tr>
             <?php endforeach; ?>

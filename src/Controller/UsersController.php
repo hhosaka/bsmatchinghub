@@ -15,7 +15,7 @@ use Abraham\TwitterOAuth\TwitterOAuth;
 class UsersController extends AppController
 {
     private $information = '来週末、新弾発売記念大会を催します。乞うご期待。';// TODO
-    private $conditions = ['競技','ショップ大会','フリー対戦','調整','連戦','一本勝負','Skype初心者','BSMH杯'];
+    private $conditions = ['競技','ショップ大会','フリー対戦','調整','連戦','一本勝負','Skype初心者','バトスピ初心者','初心者歓迎','イベント'];
 
     public function initialize()
     {
@@ -72,7 +72,6 @@ class UsersController extends AppController
     public function entry(){
         $user = $this->Users->newEntity();
         $redirectUrl = $this->request->getQuery('redirectUrl');
-        echo $redirectUrl;
         if ($this->request->is('post')) {
             if($this->request->getData()['accept']){
                 $user = $this->Users->patchEntity($user, $this->request->getData());
@@ -177,8 +176,9 @@ class UsersController extends AppController
         $this->set(compact('user', 'users','data'));
     }
 
-    public function admin()
+    public function admin($id=1)
     {
+        $player = $this->Users->findById($id)->first();
         $conds[]=['status'=>'active']; // アクティブのみ
         $conds[]=['end_time >='=> date("Y/m/d H:i:s")];//　終了したものは除く
         $search_keyword ='';
@@ -198,7 +198,32 @@ class UsersController extends AppController
 
         $this->set('conditions', $this->conditions);
         $data = $this->unpackKeywords($search_keyword);
-        $this->set(compact('users','data'));
+        $this->set(compact('users','data','player'));
+    }
+
+    private function offerAction($player1,$player2){
+        if($player1->status=='ACTIVE'){
+            $player1->status = 'INACTIVE';
+            $this->Users->save($player1);
+        }
+
+        $message = $player2->handlename."さんと対戦してください。\r\n";
+        $message .= "Skype ID:".$player2->skype_account."\r\n";
+        $message = $message . "http://plumbline.xsrv.jp/bsmh/users";
+
+        $this->sendDM($player1->twitter_account, $message);
+    }
+
+    public function offer($id1, $id2)// TODO error handle
+    {
+        //if($id1 != $id2){
+            $player1 = $this->Users->get($id1);
+            $player2 = $this->Users->get($id2);
+    
+            $this->offerAction($player1,$player2);
+            $this->offerAction($player2,$player1);
+        //}
+        return $this->redirect($this->request->referer());
     }
 
     /**
