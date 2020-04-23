@@ -361,6 +361,11 @@ class UsersController extends AppController
     public function activate()
     {
         $user = $this->Users->get($this->Auth->user()['id']);
+        $user->start_time = date("Y/m/d H:i:s");
+        $end_time = date("Y/m/d H:i:s",strtotime('+60 minute'));
+        if($user->end_time < $end_time){
+            $user->end_time = $end_time;
+        }
         if ($this->request->is(['patch', 'post', 'put'])) {
             $user = $this->Users->patchEntity($user, $this->request->getData());
             $user['status'] = 'ACTIVE';
