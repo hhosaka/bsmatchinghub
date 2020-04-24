@@ -381,14 +381,19 @@ class UsersController extends AppController
         $this->set(compact('user'));
     }
 
-    public function deactivate()
-    {
-        $user = $this->Users->get($this->Auth->user()['id']);
+    public function forceDeactivate($id){
+        $user = $this->Users->get($id);
         $user['status'] = 'INACTIVE';
         $this->Users->save($user);
-        $this->Flash->success(__('Deactivated.'));
-        return $this->redirect(['action' => 'index']);
+        $this->Flash->success(__($user->handlename.' is Deactivated.'));
+        return $this->redirect($this->request->referer());
     }
+
+    public function deactivate()
+    {
+        $this->forceDeactivate($this->Auth->user()['id']);
+    }
+
     /**
      * Delete method
      *

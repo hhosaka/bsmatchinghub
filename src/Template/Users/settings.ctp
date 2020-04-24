@@ -40,11 +40,11 @@
             
         ?>
         <?= $this->Form->control('others', ['label'=>'キーワード("|"で複数条件を指定できます。)','value'=>$data['others']]);?>
-        <div style="display:inline-flex">
+        <!--div style="display:inline-flex"-->
         <?php $i=0; foreach ($keywords as $keyword):?>
             <?=$this->Form->control('keyword'.$i, ['type'=>'checkbox','label'=>$keyword,'checked'=>$data['keyword'.$i]]); $i=$i+1 ?>
         <?php endforeach ?>
-        </div>
+        <!--/div-->
     </fieldset>
     <?= $this->Form->button(__('保存')) ?>
     <?= $this->Form->end() ?>

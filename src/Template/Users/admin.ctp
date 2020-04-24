@@ -7,19 +7,20 @@
 <nav class="large-3 medium-4 columns" id="actions-sidebar">
     <ul class="side-nav">
         <li class="heading"><?= __('Actions') ?></li>
-        <li><?= $this->Html->link(__('ログアウト'), ['action' => 'logout']) ?></li>
+        <li><?= $this->Html->link(__('Logout'), ['action' => 'logout']) ?></li>
     </ul>
 </nav>
 <div class="users index large-9 medium-8 columns content">
-    <?='対象：'.$player->handlename?>
+    <?='Target:'.$player->handlename?>
     <table cellpadding="0" cellspacing="0">
         <thead>
             <tr>
                 <th scope="col" width ="5%"><?= $this->Paginator->sort('id',['label'=>'ID']) ?></th>
-                <th scope="col" width ="15%"><?= $this->Paginator->sort('handlename',['label'=>'ハンドルネーム']) ?></th>
+                <th scope="col" width ="15%"><?= $this->Paginator->sort('handlename',['label'=>'Handle name']) ?></th>
+                <th scope="col" width ="15%"><?= $this->Paginator->sort('twitter_account',['label'=>'Twitter ID']) ?></th>
                 <th scope="col" width ="15%"><?= $this->Paginator->sort('skype_account',['label'=>'Skype ID']) ?></th>
-                <th scope="col" width ="15%"><?= $this->Paginator->sort('end_time',['label'=>'終了予定時間']) ?></th>
-                <th scope="col"><?= $this->Paginator->sort('comment',['label'=>'コメント']) ?></th>
+                <th scope="col" width ="15%"><?= $this->Paginator->sort('end_time',['label'=>'end time']) ?></th>
+                <th scope="col"><?= $this->Paginator->sort('comment',['label'=>'Comment']) ?></th>
                 <th scope="col" width ="20%" class="actions"><?= __('Actions') ?></th>
             </tr>
         </thead>
@@ -28,13 +29,15 @@
             <tr>
                 <td><?= $this->Number->format($user->id) ?></td>
                 <td><?= h($user->handlename) ?></td>
+                <td><?= h($user->twitter_account) ?></td>
                 <td><?= h($user->skype_account) ?></td>
                 <td><?= h($user->end_time) ?></td>
                 <td><?= h($user->comment) ?></td>
                 <td class="actions">
-                    <?= $this->Html->link(__('[詳細]'), ['action' => 'view', $user->id]) ?>
-                    <?= $this->Html->link(__('[対象]'), ['action' => 'admin', $user->id]) ?>
-                    <?= $this->Html->link(__('[案内]'), ['action' => 'offer', $player->id, $user->id]) ?>
+                    <?= $this->Html->link(__('[Detail]'), ['action' => 'view', $user->id]) ?>
+                    <?= $this->Html->link(__('[Target]'), ['action' => 'admin', $user->id]) ?>
+                    <?= $this->Html->link(__('[offer]'), ['action' => 'offer', $player->id, $user->id]) ?>
+                    <?= $this->Html->link(__('[deactivate]'), ['action' => 'forceDeactivate', $user->id]) ?>
                 </td>
             </tr>
             <?php endforeach; ?>
@@ -51,18 +54,18 @@
         <p><?= $this->Paginator->counter(['format' => __('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')]) ?></p>
     </div>
 
-    <Legend><?= __('検索条件') ?></Legend>
+    <Legend><?= __('Requery') ?></Legend>
     <hr>
 
     <?=$this->Form->create() ?>
     <fieldset>
-    <?=$this->Form->control('others',['label'=>'検索用キーワード("|"で複数条件を指定できます。)','value'=>$data['others']]) ?>
+    <?=$this->Form->control('others',['label'=>'Keyword','value'=>$data['others']]) ?>
     <div style="display:inline-flex">
     <?php $i=0; foreach ($conditions as $condition):?>
         <?=$this->Form->control('keyword'.$i ,['type'=>'checkbox','label'=>$condition,'checked'=>$data['keyword'.$i]]); $i=$i+1 ?>
     <?php endforeach ?>
     </div>
     </fieldset>
-    <?=$this->Form->button("再検索")?>
+    <?=$this->Form->button("Send")?>
     <?=$this->Form->end()?>
 </div>
