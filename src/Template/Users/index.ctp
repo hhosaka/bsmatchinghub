@@ -87,4 +87,5 @@
     </fieldset>
     <?=$this->Form->button("再検索")?>
     <?=$this->Form->end()?>
+    <legend>サービスを受けるために @BSMatchMaker をフォローしてください。</legend>
 </div>

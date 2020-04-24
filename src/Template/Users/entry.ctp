@@ -5,6 +5,7 @@
  */
 ?>
 <div class="users form large-9 medium-8 columns content">
+    <legend>サービスを受けるために @BSMatchMaker をフォローしてください。</legend>
     <?= $this->Form->create($user) ?>
     <fieldset>
         <legend><?= __('ユーザー登録') ?></legend>

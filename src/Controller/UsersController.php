@@ -191,7 +191,7 @@ class UsersController extends AppController
 
         $query = $this->Users
             ->find('all',[
-                'fields'=>['Users.id','handlename','start_time','end_time','comment'],
+                'fields'=>['Users.id','handlename','end_time','comment','skype_account','twitter_account'],
                 'conditions'=>['and'=>[$conds]]]);
 
         $users = $this->paginate($query);
@@ -275,21 +275,25 @@ class UsersController extends AppController
         $twitter = $this->createTwitterOAuth();
         $userinfo = $twitter->get('users/show',['screen_name'=>$dmto]);
 
-        $params = [
-            'event' => [
-                'type' => 'message_create',
-                'message_create' => [
-                    'target' => [
-                        'recipient_id' => $userinfo->id
-                    ],
-                    'message_data' => [
-                        "text" => $message
+        if($userinfo==null){
+            $this->Flash->error(__($dmto.'のIDが見つかりません。'));
+        }else{
+            $params = [
+                'event' => [
+                    'type' => 'message_create',
+                    'message_create' => [
+                        'target' => [
+                            'recipient_id' => $userinfo->id
+                        ],
+                        'message_data' => [
+                            "text" => $message
+                        ]
                     ]
                 ]
-            ]
-        ];
-        $response = $twitter->post('direct_messages/events/new', $params, true);
-        //$this->log($response);
+            ];
+            $response = $twitter->post('direct_messages/events/new', $params, true);
+            //$this->log($response);
+        }
     }
 
     private function postTweet($message){
