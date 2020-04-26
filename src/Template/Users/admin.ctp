@@ -18,7 +18,7 @@
                 <th scope="col" width ="5%"><?= $this->Paginator->sort('id',['label'=>'ID']) ?></th>
                 <th scope="col" width ="15%"><?= $this->Paginator->sort('handlename',['label'=>'Handle name']) ?></th>
                 <th scope="col" width ="15%"><?= $this->Paginator->sort('twitter_account',['label'=>'Twitter ID']) ?></th>
-                <th scope="col" width ="15%"><?= $this->Paginator->sort('skype_account',['label'=>'Skype ID']) ?></th>
+                <th scope="col" width ="20%" class="skypeid"><?= __('Skype ID') ?></th>
                 <th scope="col" width ="15%"><?= $this->Paginator->sort('end_time',['label'=>'end time']) ?></th>
                 <th scope="col"><?= $this->Paginator->sort('comment',['label'=>'Comment']) ?></th>
                 <th scope="col" width ="20%" class="actions"><?= __('Actions') ?></th>
@@ -30,7 +30,15 @@
                 <td><?= $this->Number->format($user->id) ?></td>
                 <td><?= h($user->handlename) ?></td>
                 <td><?= h($user->twitter_account) ?></td>
-                <td><?= h($user->skype_account) ?></td>
+                <td class="skypeid">
+                <input type="button" value="<?php echo $user->skype_account ?>" onclick='
+                        var ta = document.createElement("textarea");
+	                    ta.value = "<?php echo $user->skype_account; ?>";
+	                    document.body.appendChild(ta);
+	                    ta.select();
+	                    document.execCommand("copy");
+	                    ta.parentElement.removeChild(ta);'/>
+                </td>
                 <td><?= h($user->end_time) ?></td>
                 <td><?= h($user->comment) ?></td>
                 <td class="actions">
@@ -60,11 +68,11 @@
     <?=$this->Form->create() ?>
     <fieldset>
     <?=$this->Form->control('others',['label'=>'Keyword','value'=>$data['others']]) ?>
-    <div style="display:inline-flex">
+    <!--div style="display:inline-flex"-->
     <?php $i=0; foreach ($conditions as $condition):?>
         <?=$this->Form->control('keyword'.$i ,['type'=>'checkbox','label'=>$condition,'checked'=>$data['keyword'.$i]]); $i=$i+1 ?>
     <?php endforeach ?>
-    </div>
+    <!--/ div-->
     </fieldset>
     <?=$this->Form->button("Send")?>
     <?=$this->Form->end()?>
