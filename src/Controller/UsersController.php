@@ -291,14 +291,18 @@ class UsersController extends AppController
                     ]
                 ]
             ];
-            $response = $twitter->post('direct_messages/events/new', $params, true);
-            //$this->log($response);
+            if(TWITTER_SUPPORT=='ENABLE'){
+                $response = $twitter->post('direct_messages/events/new', $params, true);
+                $this->log($response);
+            }
         }
     }
 
     private function postTweet($message){
-        $response = $this->createTwitterOAuth()->post("statuses/update", ["status" => $message]);
-        //$this->log($response);
+        if(TWITTER_SUPPORT=='ENABLE'){
+            $response = $this->createTwitterOAuth()->post("statuses/update", ["status" => $message]);
+            $this->log($response);
+        }
     }
 
     private function sendMatchRequest($sender, $target){
@@ -371,7 +375,9 @@ class UsersController extends AppController
             $user->end_time = $end_time;
         }
         if ($this->request->is(['patch', 'post', 'put'])) {
+            $data = $this->request->getData();
             $user = $this->Users->patchEntity($user, $this->request->getData());
+            $user['keyword'] = $this->packKeyword($data,$data['others']);
             $user['status'] = 'ACTIVE';
             if ($this->Users->save($user)) {
                 $this->Flash->success(__('Activated.'));
@@ -382,6 +388,8 @@ class UsersController extends AppController
                 $this->Flash->error(__('The user could not be saved. Please, try again.'));
             }
         }
+        $this->set('keywords', $this->conditions);
+        $this->set('data',$this->unpackKeywords($user['keyword']));
         $this->set(compact('user'));
     }
 

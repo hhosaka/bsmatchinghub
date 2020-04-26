@@ -202,4 +202,6 @@ Type::build('timestamp')
 //Inflector::rules('uninflected', ['dontinflectme']);
 //Inflector::rules('transliteration', ['/å/' => 'aa']);
 
+define('TWITTER_SUPPORT', 'DISABLE');
+
 require __DIR__ . '/bootstrap_keys.php';

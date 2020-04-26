@@ -18,10 +18,10 @@
                 <th scope="col" width ="5%"><?= $this->Paginator->sort('id',['label'=>'ID']) ?></th>
                 <th scope="col" width ="15%"><?= $this->Paginator->sort('handlename',['label'=>'Handle name']) ?></th>
                 <th scope="col" width ="15%"><?= $this->Paginator->sort('twitter_account',['label'=>'Twitter ID']) ?></th>
-                <th scope="col" width ="20%" class="skypeid"><?= __('Skype ID') ?></th>
+                <th scope="col" width ="15%" class="skypeid"><?= __('Skype ID') ?></th>
                 <th scope="col" width ="15%"><?= $this->Paginator->sort('end_time',['label'=>'end time']) ?></th>
                 <th scope="col"><?= $this->Paginator->sort('comment',['label'=>'Comment']) ?></th>
-                <th scope="col" width ="20%" class="actions"><?= __('Actions') ?></th>
+                <th scope="col" width ="15%" class="actions"><?= __('Actions') ?></th>
             </tr>
         </thead>
         <tbody>
@@ -68,11 +68,14 @@
     <?=$this->Form->create() ?>
     <fieldset>
     <?=$this->Form->control('others',['label'=>'Keyword','value'=>$data['others']]) ?>
-    <!--div style="display:inline-flex"-->
+    <div style="display:inline-flex">
     <?php $i=0; foreach ($conditions as $condition):?>
         <?=$this->Form->control('keyword'.$i ,['type'=>'checkbox','label'=>$condition,'checked'=>$data['keyword'.$i]]); $i=$i+1 ?>
+        <?php if($i%4==3):?>
+            </div><br><div style="display:inline-flex">
+        <?php endif?>
     <?php endforeach ?>
-    <!--/ div-->
+    </div>
     </fieldset>
     <?=$this->Form->button("Send")?>
     <?=$this->Form->end()?>
