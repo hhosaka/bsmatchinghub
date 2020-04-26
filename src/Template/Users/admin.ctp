@@ -76,6 +76,7 @@
         <?php endif?>
     <?php endforeach ?>
     </div>
+    <?=$this->Form->control('activeonly',['type'=>'checkbox','label'=>'Active Only','checked'=>$activeonly]) ?>
     </fieldset>
     <?=$this->Form->button("Send")?>
     <?=$this->Form->end()?>

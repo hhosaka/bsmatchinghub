@@ -179,15 +179,21 @@ class UsersController extends AppController
     public function admin($id=1)
     {
         $player = $this->Users->findById($id)->first();
-        $conds[]=['status'=>'active']; // アクティブのみ
-        $conds[]=['end_time >='=> date("Y/m/d H:i:s")];//　終了したものは除く
         $search_keyword ='';
+        $activeonly = true;
+
         if($this->request->is('post')){
             $data = $this->request->getData();
             $search_keyword = $this->packKeyword($data, $data['others']);
+            $activeonly = $data['activeonly'];
         }
-        $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime('now'))];
-        $conds = array_merge($conds, $this->convStr2Conds($search_keyword));
+
+        $conds = $this->convStr2Conds($search_keyword);
+        if($activeonly){
+            $conds[]=['status'=>'active']; // アクティブのみ
+            $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime('now'))];
+            $conds[]=['end_time >='=> date("Y/m/d H:i:s")];//　終了したものは除く
+        }
 
         $query = $this->Users
             ->find('all',[
@@ -198,7 +204,7 @@ class UsersController extends AppController
 
         $this->set('conditions', $this->conditions);
         $data = $this->unpackKeywords($search_keyword);
-        $this->set(compact('users','data','player'));
+        $this->set(compact('users','data','player','activeonly'));
     }
 
     private function offerAction($player1,$player2){
