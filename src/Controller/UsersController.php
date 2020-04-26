@@ -14,8 +14,8 @@ use Abraham\TwitterOAuth\TwitterOAuth;
  */
 class UsersController extends AppController
 {
-    private $information = '来週末、新弾発売記念大会を催します。乞うご期待。';// TODO
     private $conditions = ['競技','ショップ大会','フリー対戦','調整','連戦','一本勝負','Skype初心者','バトスピ初心者','初心者歓迎','イベント'];
+    private $informationfile = "information.txt";
 
     public function initialize()
     {
@@ -170,7 +170,7 @@ class UsersController extends AppController
 
         $users = $this->paginate($query);
 
-        $this->set('information', $this->getUserInfo('BSMatchingHub')->description);
+        $this->set('information', file_get_contents($this->informationfile));
         $this->set('conditions', $this->conditions);
         $data = $this->unpackKeywords($user['search_keyword']);
         $this->set(compact('user', 'users','data'));
@@ -186,7 +186,9 @@ class UsersController extends AppController
             $data = $this->request->getData();
             $search_keyword = $this->packKeyword($data, $data['others']);
             $activeonly = $data['activeonly'];
+            file_put_contents($this->informationfile, $data['information']);
         }
+        $information = file_get_contents($this->informationfile);
 
         $conds = $this->convStr2Conds($search_keyword);
         if($activeonly){
@@ -204,7 +206,7 @@ class UsersController extends AppController
 
         $this->set('conditions', $this->conditions);
         $data = $this->unpackKeywords($search_keyword);
-        $this->set(compact('users','data','player','activeonly'));
+        $this->set(compact('users', 'data', 'player', 'activeonly', 'information'));
     }
 
     private function offerAction($player1,$player2){
