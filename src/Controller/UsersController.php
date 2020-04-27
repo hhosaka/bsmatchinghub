@@ -384,12 +384,15 @@ class UsersController extends AppController
         }
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
-            $user = $this->Users->patchEntity($user, $this->request->getData());
+            $user = $this->Users->patchEntity($user, $data);
             $user['keyword'] = $this->packKeyword($data,$data['others']);
             $user['status'] = 'ACTIVE';
             if ($this->Users->save($user)) {
                 $this->Flash->success(__('Activated.'));
-                $this->postActivateMessage($user);
+                if(!$data['close']){
+                    $this->postActivateMessage($user);
+                    $this->log('open');
+                }
                 return $this->redirect(['action' => 'index']);
             }
             else{

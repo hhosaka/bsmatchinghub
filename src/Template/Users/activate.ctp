@@ -22,6 +22,7 @@
             <?php endif?>
         <?php endforeach ?>
         </div>
+        <?= $this->Form->control('close', ['type'=>'checkbox', 'label'=>'ツイッターに報告しない', 'checked'=>false]);?>
     </fieldset>
     <?= $this->Form->button(__('送信')) ?>
     <?= $this->Form->end() ?>
