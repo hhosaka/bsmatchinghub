@@ -40,7 +40,7 @@ class UsersController extends AppController
     public function isAuthorized($user = null)
     {
         $action = $this->request->getParam('action');
-        if(in_array($action,['index','activate','deactivate','settings','requestMatch','view'])){
+        if(in_array($action,['index','activate','deactivate','settings','requestMatch','view','accept','reject'])){
                 return true;
         }
         return parent::isAuthorized($user);
@@ -48,25 +48,25 @@ class UsersController extends AppController
 
     public function login()
     {
+        $redirectUrl = $this->Auth->redirectUrl();
         if ($this->request->isPost()) {
             $user = $this->Auth->identify();
 
             if ($user) {
                 $this->Auth->setUser($user);
-                return $this->redirect($this->Auth->redirectUrl());
+                return $this->redirect($redirectUrl);
             }
             else{
                 $this->Flash->error(__('ユーザー名かパスワードが違います。(ERROR002)'));
             }
         }
-        $redirectUrl = $this->Auth->redirectUrl();
-        $this->set('redirectUrl', $redirectUrl);
+        $this->set(compact('redirectUrl'));
     }
 
     public function logout()
     {
         $this->request->getSession()->destroy();
-        return $this->redirect($this->Auth->logout());
+        return $this->redirect(['action'=>'index']);
     }
 
     public function entry(){
@@ -278,14 +278,39 @@ class UsersController extends AppController
         return $twitter->get('users/show',['screen_name'=>$account]);
     }
 
-    private function sendDM($dmto, $message){
+    private function postTweet($message){
+        if(TWITTER_SUPPORT=='ENABLE'){
+            $response = $this->createTwitterOAuth()->post("statuses/update", ["status" => $message]);
+            $this->log($response);
+        }
+    }
+
+    private function sendMatchRequest($sender, $target){
 
         $twitter = $this->createTwitterOAuth();
+
+        $dmto = $target->twitter_account;
+        $message = $sender['handlename']."(@".$sender['twitter_account'].")さんから対戦のお誘いがあります。\r\n";
+        $message = $message . "「". mb_substr($sender['comment'],0,64). "」\r\n";
+        $message = $message . "Skype ID:". $sender['skype_account']."\r\n";
+
         $userinfo = $twitter->get('users/show',['screen_name'=>$dmto]);
+        $url = "http://plumbline.xsrv.jp/bsmh";//CORE_PATH;
 
         if($userinfo==null){
             $this->Flash->error(__($dmto.'のIDが見つかりません。'));
         }else{
+            $ctas = [
+                [
+                    "type" => "web_url",
+                    "label" => "対戦します",
+                    "url" => $url."/users/accept/".$sender->id."/".$target->id
+                ], [
+                    "type" => "web_url",
+                    "label" => "お断りします",
+                    "url" => $url."/users/reject/".$sender->id."/".$target->id
+                ]
+            ];
             $params = [
                 'event' => [
                     'type' => 'message_create',
@@ -294,7 +319,8 @@ class UsersController extends AppController
                             'recipient_id' => $userinfo->id
                         ],
                         'message_data' => [
-                            "text" => $message
+                            "text" => $message,
+                            "ctas" => $ctas
                         ]
                     ]
                 ]
@@ -306,21 +332,23 @@ class UsersController extends AppController
         }
     }
 
-    private function postTweet($message){
-        if(TWITTER_SUPPORT=='ENABLE'){
-            $response = $this->createTwitterOAuth()->post("statuses/update", ["status" => $message]);
-            $this->log($response);
-        }
+    public function accept($senderid, $targetid){
+        $sender = $this->Users->get($senderid);
+        $target = $this->Users->get($targetid);
+
+        $sender->status = 'INACTIVE';
+        $this->Users->save($sender);
+        $target->status = 'INACTIVE';
+        $this->Users->save($target);
+
+        $this->set(compact('sender', 'target'));
     }
 
-    private function sendMatchRequest($sender, $target){
+    public function reject($senderid, $targetid){
+        $sender = $this->Users->get($senderid);
+        $target = $this->Users->get($targetid);
 
-        $message = $sender['handlename']."(@".$sender['twitter_account'].")さんから対戦のお誘いがあります。\r\n";
-        $message = $message . "「". mb_substr($sender['comment'],0,64). "」\r\n";
-        $message = $message . "Skype ID:". $sender['skype_account']."\r\n";
-        $message = $message . "対戦希望終了はこちらから >　http://plumbline.xsrv.jp/bsmh/users/deactivate";
-
-        $this->sendDM($target->twitter_account, $message);
+        $this->set(compact('sender', 'target'));
     }
 
     private function postActivateMessage($user){

@@ -56,10 +56,10 @@ class AppController extends Controller
                 ]
             ],
             'authorize' => ['Controller'],
-            'loginRedirect' => [
-                'controller' => 'Users',
-                'action' => 'index'
-            ],
+            // 'loginRedirect' => [
+            //     'controller' => 'Users',
+            //     'action' => 'index'
+            // ],
             'logoutRedirect' => [
                 'controller' => 'Users',
                 'action' => 'login',
