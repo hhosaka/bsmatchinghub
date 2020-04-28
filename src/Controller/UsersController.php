@@ -304,11 +304,11 @@ class UsersController extends AppController
                 [
                     "type" => "web_url",
                     "label" => "対戦します",
-                    "url" => $url."/users/accept/".$sender->id."/".$target->id
+                    "url" => $url."/users/accept/".$sender->id
                 ], [
                     "type" => "web_url",
                     "label" => "お断りします",
-                    "url" => $url."/users/reject/".$sender->id."/".$target->id
+                    "url" => $url."/users/reject/".$sender->id
                 ]
             ];
             $params = [
@@ -332,9 +332,9 @@ class UsersController extends AppController
         }
     }
 
-    public function accept($senderid, $targetid){
+    public function accept($senderid){
         $sender = $this->Users->get($senderid);
-        $target = $this->Users->get($targetid);
+        $target = $this->Users->get($this->Auth->user()['id']);
 
         $sender->status = 'INACTIVE';
         $this->Users->save($sender);
@@ -344,11 +344,38 @@ class UsersController extends AppController
         $this->set(compact('sender', 'target'));
     }
 
-    public function reject($senderid, $targetid){
+    public function reject($senderid){
         $sender = $this->Users->get($senderid);
-        $target = $this->Users->get($targetid);
+        $target = $this->Users->get($this->Auth->user()['id']);
 
-        $this->set(compact('sender', 'target'));
+        $twitter = $this->createTwitterOAuth();
+
+        $dmto = $sender->twitter_account;
+        $message = $target['handlename']."さんより、対戦辞退される旨連絡が入りました。\r\n申し訳ありません。";
+
+        $userinfo = $twitter->get('users/show',['screen_name'=>$dmto]);
+
+        if($userinfo==null){
+            $this->Flash->error(__($dmto.'のIDが見つかりません。'));
+        }else{
+            $params = [
+                'event' => [
+                    'type' => 'message_create',
+                    'message_create' => [
+                        'target' => [
+                            'recipient_id' => $userinfo->id
+                        ],
+                        'message_data' => [
+                            "text" => $message
+                        ]
+                    ]
+                ]
+            ];
+            if(TWITTER_SUPPORT=='ENABLE'){
+                $response = $twitter->post('direct_messages/events/new', $params, true);
+                $this->log($response);
+            }
+        }
     }
 
     private function postActivateMessage($user){
