@@ -304,11 +304,11 @@ class UsersController extends AppController
                 [
                     "type" => "web_url",
                     "label" => "対戦します",
-                    "url" => $url."/users/accept/".$sender->id
+                    "url" => $url."/users/accept/".$sender['id']
                 ], [
                     "type" => "web_url",
                     "label" => "お断りします",
-                    "url" => $url."/users/reject/".$sender->id
+                    "url" => $url."/users/reject/".$sender['id']
                 ]
             ];
             $params = [
