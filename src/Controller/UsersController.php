@@ -304,11 +304,11 @@ class UsersController extends AppController
                 [
                     "type" => "web_url",
                     "label" => "対戦します",
-                    "url" => $url."/users/accept/".$sender['id']
+                    "url" => CORE_PATH_FOR_DM."/users/accept/".$sender['id']
                 ], [
                     "type" => "web_url",
                     "label" => "お断りします",
-                    "url" => $url."/users/reject/".$sender['id']
+                    "url" => CORE_PATH_FOR_DM."/users/reject/".$sender['id']
                 ]
             ];
             $params = [
@@ -336,12 +336,16 @@ class UsersController extends AppController
         $sender = $this->Users->get($senderid);
         $target = $this->Users->get($this->Auth->user()['id']);
 
-        $sender->status = 'INACTIVE';
-        $this->Users->save($sender);
-        $target->status = 'INACTIVE';
-        $this->Users->save($target);
-
-        $this->set(compact('sender', 'target'));
+        if($sender['status']=='ACTIVE'){
+            $sender->status = 'INACTIVE';
+            $this->Users->save($sender);
+            $target->status = 'INACTIVE';
+            $this->Users->save($target);
+            $result = true;
+        }else{
+            $result = false;
+        }
+        $this->set(compact('sender', 'target', 'result'));
     }
 
     public function reject($senderid){
@@ -393,11 +397,11 @@ class UsersController extends AppController
     public function requestMatch($id = null)
     {
         $target = $this->Users->get($id,['contain' => ['Friends']]);
-        $user = $this->Auth->user();
-        $this->log($target);
-        $this->log($user);
-        if($target['use_friends']!='CLOSE' || (in_array($user['id'], array_column($target->friends,'user_id')))){
-            $this->sendMatchRequest($this->Auth->user(), $this->Users->get($id));
+        $sender = $this->Auth->user();
+        $this->log("DM:".$sender['handlename']." to ".$target['handlename']);
+        if($target['use_friends']!='CLOSE' || (in_array($sender['id'], array_column($target->friends,'user_id')))){
+            $this->sendMatchRequest($sender, $target);
+            $this->Flash->success("Sent DM to ".__($target['handlename']));
         }
         else{
             $this->Flash->error(__($target['handlename'].'さんのフレンドに登録されていません。'));
@@ -440,7 +444,8 @@ class UsersController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
             $user = $this->Users->patchEntity($user, $data);
-            $user['keyword'] = $this->packKeyword($data,$data['others']);
+            $user['keyword'] = $this->packKeyword($data, $data['others']);
+            $user['end_time'] = strtotime($user['start_time']." ".$data['time']." +9 hours");// BAD Plactice
             $user['status'] = 'ACTIVE';
             if ($this->Users->save($user)) {
                 $this->Flash->success(__('Activated.'));
@@ -470,6 +475,7 @@ class UsersController extends AppController
     public function deactivate()
     {
         $this->forceDeactivate($this->Auth->user()['id']);
+        $this->Flash->success(__('Deactivated'));
     }
 
     /**

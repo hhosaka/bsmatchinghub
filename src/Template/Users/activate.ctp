@@ -10,7 +10,18 @@
         <legend><?= __('募集開始') ?></legend>
         <?php
             echo $this->Form->control('start_time',['label'=>'募集開始時間','value'=>$user->start_time]);
-            echo $this->Form->control('end_time',['label'=>'終了予定時間','value'=>$user->end_time]);
+            echo $this->Form->control('time',[
+                'label'=>'募集時間',
+                'type'=>'select',
+                'default'=>'+60 minute',
+                'options'=>[
+                    '+30 minute'=>'30分',
+                    '+60 minute'=>'1時間',
+                    '+90 minute'=>'1時間30分',
+                    '+120 minute'=>'2時間',
+                    '+150 minute'=>'2時間30分',
+                    '+180 minute'=>'3時間'
+                ]]);
             echo $this->Form->control('comment',['label'=>'コメント']);
         ?>
         <?= $this->Form->control('others', ['label'=>'キーワード("|"で複数条件を指定できます。)','value'=>$data['others']]);?>
