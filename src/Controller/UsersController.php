@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use App\Controller\AppController;
 use Cake\Event\Event;
+use Cake\I18n\Time;
 use Abraham\TwitterOAuth\TwitterOAuth;
 
 /**
@@ -445,7 +446,7 @@ class UsersController extends AppController
             $data = $this->request->getData();
             $user = $this->Users->patchEntity($user, $data);
             $user['keyword'] = $this->packKeyword($data, $data['others']);
-            $user['end_time'] = strtotime($user['start_time']." ".$data['time']." +9 hours");// BAD Plactice
+            $user['end_time'] = new Time($user['start_time']." ".$data['time']);
             $user['status'] = 'ACTIVE';
             if ($this->Users->save($user)) {
                 $this->Flash->success(__('Activated.'));
