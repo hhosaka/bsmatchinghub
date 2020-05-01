@@ -4,6 +4,7 @@ namespace App\Controller;
 use App\Controller\AppController;
 use Cake\Event\Event;
 use Cake\I18n\Time;
+use Cake\view\helper\TimeHelper;
 use Abraham\TwitterOAuth\TwitterOAuth;
 
 /**
@@ -210,28 +211,14 @@ class UsersController extends AppController
         $this->set(compact('users', 'data', 'player', 'activeonly', 'information'));
     }
 
-    private function offerAction($player1,$player2){
-        if($player1->status=='ACTIVE'){
-            $player1->status = 'INACTIVE';
-            $this->Users->save($player1);
-        }
-
-        $message = $player2->handlename."さんと対戦してください。\r\n";
-        $message .= "Skype ID:".$player2->skype_account."\r\n";
-        $message = $message . "http://plumbline.xsrv.jp/bsmh/users";
-
-        $this->sendDM($player1->twitter_account, $message);
-    }
-
-    public function offer($id1, $id2)// TODO error handle
+    public function offer($id1, $id2)
     {
-        //if($id1 != $id2){
+        if($id1 != $id2){
             $player1 = $this->Users->get($id1);
             $player2 = $this->Users->get($id2);
-    
-            $this->offerAction($player1,$player2);
-            $this->offerAction($player2,$player1);
-        //}
+            $this->sendMatchRequest($player1, $player2);
+            $this->Flash->success("Send DM to".$player1['handlename']." for make match with ".$player2['handlename']);
+        }
         return $this->redirect($this->request->referer());
     }
 
@@ -337,7 +324,7 @@ class UsersController extends AppController
         $sender = $this->Users->get($senderid);
         $target = $this->Users->get($this->Auth->user()['id']);
 
-        if($sender['status']=='ACTIVE'){
+        if(TimeHelper::isFuture($sender['end_time'])){
             $sender->status = 'INACTIVE';
             $this->Users->save($sender);
             $target->status = 'INACTIVE';
@@ -476,7 +463,6 @@ class UsersController extends AppController
     public function deactivate()
     {
         $this->forceDeactivate($this->Auth->user()['id']);
-        $this->Flash->success(__('Deactivated'));
     }
 
     /**
