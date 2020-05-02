@@ -37,7 +37,7 @@ class UsersController extends AppController
     public function isAuthorized($user = null)
     {
         $action = $this->request->getParam('action');
-        if(in_array($action,['index','activate','deactivate','settings','requestMatch','view','accept','reject'])){
+        if(in_array($action,['index','activate','deactivateSelf','settings','requestMatch','view','accept','reject'])){
                 return true;
         }
         return parent::isAuthorized($user);
@@ -303,25 +303,25 @@ class UsersController extends AppController
 
     public function accept($senderid){
         $sender = $this->Users->get($senderid);
-        $target = $this->Users->get($this->Auth->user()['id']);
+        $reciever = $this->Users->get($this->Auth->user()['id']);
 
         $sender->status = 'INACTIVE';
         $this->Users->save($sender);
-        $target->status = 'INACTIVE';
-        $this->Users->save($target);
+        $reciever->status = 'INACTIVE';
+        $this->Users->save($reciever);
         $result = true;
 
-        $this->set(compact('sender', 'target', 'result'));
+        $this->set(compact('sender', 'result'));
     }
 
     public function reject($senderid){
         $sender = $this->Users->get($senderid);
-        $target = $this->Users->get($this->Auth->user()['id']);
+        $reciever = $this->Users->get($this->Auth->user()['id']);
 
         $twitter = $this->createTwitterOAuth();
 
         $dmto = $sender->twitter_account;
-        $message = $target['handlename']."さんより、対戦辞退される旨連絡が入りました。\r\n申し訳ありません。";
+        $message = $reciever['handlename']."さんより、対戦辞退される旨連絡が入りました。\r\n申し訳ありません。";
 
         $userinfo = $twitter->get('users/show',['screen_name'=>$dmto]);
 
@@ -343,7 +343,7 @@ class UsersController extends AppController
             ];
             if(TWITTER_SUPPORT=='ENABLE'){
                 $response = $twitter->post('direct_messages/events/new', $params, true);
-                $this->log($response);
+                //$this->log($response);
             }
         }
     }
@@ -362,15 +362,15 @@ class UsersController extends AppController
 
     public function requestMatch($id = null)
     {
-        $target = $this->Users->get($id,['contain' => ['Friends']]);
         $sender = $this->Auth->user();
+        $reciever = $this->Users->get($id,['contain' => ['Friends']]);
         //$this->log("DM:".$sender['handlename']." to ".$target['handlename']);
-        if($target['use_friends']!='CLOSE' || (in_array($sender['id'], array_column($target->friends,'user_id')))){
-            $this->offer($sender, $target);
-            $this->Flash->success("Sent DM to ".__($target['handlename']));
+        if($reciever['use_friends']!='CLOSE' || (in_array($sender['id'], array_column($reciever->friends,'user_id')))){
+            $this->offer($sender, $reciever);
+            $this->Flash->success("Sent DM to ".__($reciever['handlename']));
         }
         else{
-            $this->Flash->error(__($target['handlename'].'さんのフレンドに登録されていません。'));
+            $this->Flash->error(__($reciever['handlename'].'さんのフレンドに登録されていないので送信できませんでした。'));
         }
         return $this->redirect($this->request->referer());
     }
@@ -404,7 +404,7 @@ class UsersController extends AppController
         $user = $this->Users->get($this->Auth->user()['id']);
         $user->start_time = date("Y/m/d H:i:s");
         $end_time = date("Y/m/d H:i:s",strtotime('+60 minute'));
-        if($user->end_time < $end_time){
+        if($user->end_time < $end_time){// デバッグのため強制上書きはしない
             $user->end_time = $end_time;
         }
         if ($this->request->is(['patch', 'post', 'put'])) {
@@ -414,11 +414,10 @@ class UsersController extends AppController
             $user['end_time'] = new Time($user['start_time']." ".$data['time']);
             $user['status'] = 'ACTIVE';
             if ($this->Users->save($user)) {
-                $this->Flash->success(__('Activated.'));
                 if(!$data['close']){
                     $this->postActivateMessage($user);
-                    $this->log('open');
                 }
+                $this->Flash->success(__('Activated.'));
                 return $this->redirect(['action' => 'index']);
             }
             else{
@@ -430,7 +429,7 @@ class UsersController extends AppController
         $this->set(compact('user'));
     }
 
-    public function forceDeactivate($id){
+    public function deactivate($id){
         $user = $this->Users->get($id);
         $user['status'] = 'INACTIVE';
         $this->Users->save($user);
@@ -438,18 +437,11 @@ class UsersController extends AppController
         return $this->redirect($this->request->referer());
     }
 
-    public function deactivate()
+    public function deactivateSelf()
     {
-        $this->forceDeactivate($this->Auth->user()['id']);
+        $this->deactivate($this->Auth->user()['id']);
     }
 
-    /**
-     * Delete method
-     *
-     * @param string|null $id User id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function delete($id)
     {
         $user = $this->Auth->user();

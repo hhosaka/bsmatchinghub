@@ -45,7 +45,7 @@
                     <?= $this->Html->link(__('[Detail]'), ['action' => 'view', $user->id]) ?>
                     <?= $this->Html->link(__('[Target]'), ['action' => 'admin', $user->id]) ?>
                     <?= $this->Html->link(__('[offer]'), ['action' => 'makeMatch', $player->id, $user->id]) ?>
-                    <?= $this->Html->link(__('[deactivate]'), ['action' => 'forceDeactivate', $user->id]) ?>
+                    <?= $this->Html->link(__('[deactivate]'), ['action' => 'deactivate', $user->id]) ?>
                 </td>
             </tr>
             <?php endforeach; ?>
