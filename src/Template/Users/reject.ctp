@@ -1,3 +1,3 @@
-<div class="users form large-9 medium-8 columns content">
+<div class="users form">
 <legend><?= __('対戦依頼をお断りしました。') ?></legend>
 </div>

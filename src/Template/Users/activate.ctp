@@ -4,7 +4,7 @@
  * @var \App\Model\Entity\User $user
  */
 ?>
-<div class="users form large-9 medium-8 columns content">
+<div class="users form">
     <?= $this->Form->create($user) ?>
     <fieldset>
         <legend><?= __('募集開始') ?></legend>

@@ -31,10 +31,6 @@
             <td><?= $this->Number->format($user->id) ?></td>
         </tr>
         <tr>
-            <th scope="row"><?= __('メールアドレス') ?></th>
-            <td><?= h($user->username) ?></td>
-        </tr>
-        <tr>
             <th scope="row"><?= __('ステータス') ?></th>
             <td><?= h($user->status) ?></td>
         </tr>

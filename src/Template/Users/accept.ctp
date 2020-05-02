@@ -1,5 +1,5 @@
 <?php if($result):?>
-        <div class="users form large-9 medium-8 columns content">
+        <div class="users form">
                 <legend><?= __('対戦依頼を受けました。Skypeで'.$sender->handlename."さんを呼び出してください") ?></legend>
                 <input type="button" value="Skype ID:<?php echo $sender->skype_account ?>をクリップボードにコピー" onclick='
                 var ta = document.createElement("textarea");

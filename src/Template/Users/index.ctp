@@ -9,7 +9,7 @@
         <li class="heading"><?= __('Actions') ?></li>
         <li><?= $this->Html->link(__('対戦希望開始'), ['action' => 'activate']) ?></li>
         <li><?= $this->Html->link(__('対戦希望終了'), ['action' => 'deactivateSelf']) ?></li>
-        <li><?= $this->Html->link(__('条件設定／ユーザー設定'), ['action' => 'settings']) ?></li>
+        <li><?= $this->Html->link(__('設定'), ['action' => 'settings']) ?></li>
         <li><?= $this->Html->link(__('ログアウト'), ['action' => 'logout']) ?></li>
     </ul>
 </nav>
