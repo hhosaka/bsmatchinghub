@@ -37,7 +37,7 @@ class UsersController extends AppController
     public function isAuthorized($user = null)
     {
         $action = $this->request->getParam('action');
-        if(in_array($action,['index','activate','deactivateSelf','settings','requestMatch','view','accept','reject'])){
+        if(in_array($action,['index','activate','deactivateSelf','settings','requestMatch','view','accept','reject','deleteSelf'])){
                 return true;
         }
         return parent::isAuthorized($user);
@@ -442,20 +442,19 @@ class UsersController extends AppController
         $this->deactivate($this->Auth->user()['id']);
     }
 
+    public function deleteSelf(){
+        $this->delete($this->Auth->user()['id']);
+    }
+
     public function delete($id)
     {
-        $user = $this->Auth->user();
-        if($user['role']=='admin'){
-            $this->request->allowMethod(['post', 'delete']);
-            $user = $this->Users->get($id);
-            if ($this->Users->delete($user)) {
-                $this->Flash->success(__('The user has been deleted.'));
-            } else {
-                $this->Flash->error(__('The user could not be deleted. Please, try again.'));
-            }
-        }else{
-            $this->Flash->error(__('This action is not allowed.'));
+        //$this->request->allowMethod(['post', 'delete']);
+        $user = $this->Users->get($id);
+        if ($this->Users->delete($user)) {
+            $this->Flash->success(__('The user has been deleted.'));
+        } else {
+            $this->Flash->error(__('The user could not be deleted. Please, try again.'));
         }
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect($this->request->referer());
     }
 }

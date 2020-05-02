@@ -9,8 +9,8 @@
         <li class="heading"><?= __('Actions') ?></li>
         <li><?= $this->Form->postLink(
                 __('アカウントの削除'),
-                ['action' => 'delete', $user->id],
-                ['confirm' => __('Are you sure you want to delete # {0}?', $user->id)]
+                ['action' => 'deleteSelf'],
+                ['confirm' => __('Are you sure you want to delete this account ?')]
             )
         ?></li>
         <li><?= $this->Html->link(__('フレンドリスト'), ['controller' => 'Friends', 'action' => 'index']) ?></li>

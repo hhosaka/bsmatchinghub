@@ -43,9 +43,10 @@
                 <td><?= h($user->comment) ?></td>
                 <td class="actions">
                     <?= $this->Html->link(__('[Detail]'), ['action' => 'view', $user->id]) ?>
-                    <?= $this->Html->link(__('[Target]'), ['action' => 'admin', $user->id]) ?>
-                    <?= $this->Html->link(__('[offer]'), ['action' => 'makeMatch', $player->id, $user->id]) ?>
-                    <?= $this->Html->link(__('[deactivate]'), ['action' => 'deactivate', $user->id]) ?>
+                    <?= $this->Html->link(__('[Select]'), ['action' => 'admin', $user->id]) ?>
+                    <?= $this->Html->link(__('[Offer]'), ['action' => 'makeMatch', $player->id, $user->id]) ?>
+                    <?= $this->Html->link(__('[Deactivate]'), ['action' => 'deactivate', $user->id]) ?>
+                    <?= $this->Html->link(__('[delete]'), ['action' => 'delete', $user->id]) ?>
                 </td>
             </tr>
             <?php endforeach; ?>
