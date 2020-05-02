@@ -4,7 +4,6 @@ namespace App\Controller;
 use App\Controller\AppController;
 use Cake\Event\Event;
 use Cake\I18n\Time;
-use Cake\view\helper\TimeHelper;
 use Abraham\TwitterOAuth\TwitterOAuth;
 
 /**
@@ -19,24 +18,20 @@ class UsersController extends AppController
     private $conditions = ['競技','ショップ大会','フリー対戦','調整','連戦','一本勝負','Skype初心者','バトスピ初心者','初心者歓迎','イベント'];
     private $informationfile = "information.txt";
 
-    public function initialize()
-    {
-        parent::initialize();
-        $validator = $this->Users->getValidator('default');
-        $validator->add('confirm', 'no-misspelling', [
-            'rule' => ['compareWith', 'password'],
-            'message' => '確認用のパスワードが一致しません',
-        ]);
-        $validator->add('confirm_email', 'no-misspelling', [
-            'rule' => ['compareWith', 'email1'],
-            'message' => '確認用のメールアドレスが一致しません',
-        ]);
-    }
+    // public function initialize()
+    // {
+    //     parent::initialize();
+    //     $validator = $this->Users->getValidator('default');
+    //     $validator->add('confirm', 'no-misspelling', [
+    //         'rule' => ['compareWith', 'password'],
+    //         'message' => '確認用のパスワードが一致しません',
+    //     ]);
+    // }
 
     public function beforeFilter(Event $event)
     {
         parent::beforeFilter($event);
-        $this->Auth->allow(['entry', 'tos','logout']);
+        $this->Auth->allow(['entry','logout']);
     }
 
     public function isAuthorized($user = null)
@@ -59,7 +54,7 @@ class UsersController extends AppController
                 return $this->redirect($redirectUrl);
             }
             else{
-                $this->Flash->error(__('ユーザー名かパスワードが違います。(ERROR002)'));
+                $this->Flash->error(__('ユーザー名かパスワードが違います。新規の方は新規登録をお願いします。(ERROR002)'));
             }
         }
         $this->set(compact('redirectUrl'));
@@ -73,33 +68,25 @@ class UsersController extends AppController
 
     public function entry(){
         $user = $this->Users->newEntity();
-        $redirectUrl = $this->request->getQuery('redirectUrl');
         if ($this->request->is('post')) {
-            if($this->request->getData()['accept']){
-                $user = $this->Users->patchEntity($user, $this->request->getData());
+            $data = $this->request->getData();
+            if($data['accept']){
+                $user = $this->Users->patchEntity($user, $data);
                 $user['role'] = 'guest';
                 if ($this->Users->save($user)) {
-                    $this->Flash->success(__('登録完了しました。'));
+                    $this->Flash->success(__($user['handlename'].'さんのアカウントを登録しました。'));
                     $this->Auth->setUser($user);
-                    
-                    return $this->redirect($redirectUrl);
+                    return $this->redirect($this->request->getQuery('redirectUrl'));
                 }
-                else{
-                    $this->Flash->error(__('登録に失敗しました。'));
-                }
+                $this->Flash->error(__('アカウントは登録できませんでした。'));
             }else{
                 $this->Flash->error(__('登録の為には利用規約への同意が必要です。'));
             }
-
-            $this->Flash->error(__('登録できませんでした。'));
         }
         $this->set(compact('user'));
     }
 
-    public function tos(){
-
-    }
-    private function convStr2Conds($keywords){
+    private function convKeywords2Conds($keywords){
         $conds = null;
         foreach(explode("|", $keywords) as $keyword){
             $conds[] = ['keyword LIKE'=>'%'.$keyword.'%'];
@@ -160,7 +147,7 @@ class UsersController extends AppController
             $this->Users->save($user);
         }
         $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime($leadtime))];
-        $conds = array_merge($conds, $this->convStr2Conds($user['search_keyword']));
+        $conds = array_merge($conds, $this->convKeywords2Conds($user['search_keyword']));
 
         $query = $this->Users
             ->find('all',[
@@ -192,7 +179,7 @@ class UsersController extends AppController
         }
         $information = file_get_contents($this->informationfile);
 
-        $conds = $this->convStr2Conds($search_keyword);
+        $conds = $this->convKeywords2Conds($search_keyword);
         if($activeonly){
             $conds[]=['status'=>'active']; // アクティブのみ
             $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime('now'))];
@@ -288,6 +275,7 @@ class UsersController extends AppController
         if($userinfo==null){
             $this->Flash->error(__($dmto.'のIDが見つかりません。'));
         }else{
+            $this->log($userinfo);
             $ctas = [
                 [
                     "type" => "web_url",
@@ -324,15 +312,12 @@ class UsersController extends AppController
         $sender = $this->Users->get($senderid);
         $target = $this->Users->get($this->Auth->user()['id']);
 
-        if(TimeHelper::isFuture($sender['end_time'])){
-            $sender->status = 'INACTIVE';
-            $this->Users->save($sender);
-            $target->status = 'INACTIVE';
-            $this->Users->save($target);
-            $result = true;
-        }else{
-            $result = false;
-        }
+        $sender->status = 'INACTIVE';
+        $this->Users->save($sender);
+        $target->status = 'INACTIVE';
+        $this->Users->save($target);
+        $result = true;
+
         $this->set(compact('sender', 'target', 'result'));
     }
 

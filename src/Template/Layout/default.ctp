@@ -42,6 +42,7 @@ $cakeDescription = 'BS Matching Hub';
         </ul>
         <div class="top-bar-section">
             <ul class="right">
+                <li><a target="_blank" href="https://sites.google.com/site/hhosaka183/bs-matching-hub/bs-matching-hub-li-yong-gui-yue/">利用規約</a></li>
                 <li><a target="_blank" href="https://bsmatchinghub.blogspot.com/">Blog</a></li>
             </ul>
         </div>
