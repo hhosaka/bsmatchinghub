@@ -15,7 +15,7 @@ use Abraham\TwitterOAuth\TwitterOAuth;
  */
 class UsersController extends AppController
 {
-    private $conditions = ['競技','ショップ大会','フリー対戦','調整','連戦','一本勝負','Skype初心者','バトスピ初心者','初心者歓迎','イベント'];
+    private $keywordlist = ['競技','ショップ大会','フリー対戦','調整','連戦','一本勝負','Skype初心者','バトスピ初心者','初心者歓迎','イベント'];
     private $informationfile = "information.txt";
 
     // public function initialize()
@@ -94,22 +94,17 @@ class UsersController extends AppController
         return $conds;
     }
 
-    private function unpackKeywords($search_keywords){
-        $keywords = $this->conditions;
-        $count = count($keywords);
+    private function unpackKeywords($keywords){
+        $keywordlist = $this->keywordlist;
         $buf = null;
-        for($i=0; $i<$count; ++$i){
-            if(strpos($search_keywords, $keywords[$i])!==false){
-                $buf['keyword'.$i] =  '1';
-            }else{
-                $buf['keyword'.$i] =  '0';
-            }
+        for($i=0; $i < count($keywordlist); ++$i){
+            $buf['keyword'.$i] = strpos($keywords, $keywordlist[$i]);
         }
 
         $buf['others'] = "";
-        foreach(explode("|", $search_keywords) as $keyword){
+        foreach(explode("|", $keywords) as $keyword){
             if($keyword!=""){
-                if(!in_array($keyword, $keywords)){
+                if(!in_array($keyword, $keywordlist)){
                     $buf['others'].='|'.$keyword;
                 }
             }
@@ -118,12 +113,11 @@ class UsersController extends AppController
     }
 
     private function packKeyword($data, $others){
-        $keywords = $this->conditions;
-        $count = count($keywords);
+        $keywordlist = $this->keywordlist;
         $buf = $others;
-        for($i=0;$i<$count;++$i){
+        for($i=0; $i < count($keywordlist); ++$i){
             if($data['keyword'.$i]){
-                $keyword = $keywords[$i];
+                $keyword = $keywordlist[$i];
                 if(strpos($buf, $keyword)==false){
                     $buf .= '|'.$keyword;
                 }
@@ -134,7 +128,7 @@ class UsersController extends AppController
 
     public function index()
     {
-        $user = $this->Users->findById($this->Auth->user()['id'])->first();
+        $user = $this->Users->get($this->Auth->user()['id']);
 
         $conds[]=['Users.id !='=>$user['id']];// 本人は除く
         $conds[]=['status'=>'active']; // アクティブのみ
@@ -160,14 +154,14 @@ class UsersController extends AppController
         $users = $this->paginate($query);
 
         $this->set('information', file_get_contents($this->informationfile));
-        $this->set('conditions', $this->conditions);
+        $this->set('keywordlist', $this->keywordlist);
         $data = $this->unpackKeywords($user['search_keyword']);
         $this->set(compact('user', 'users','data'));
     }
 
     public function admin($id=1)
     {
-        $player = $this->Users->findById($id)->first();
+        $player = $this->Users->get($id);
         $search_keyword ='';
         $activeonly = true;
 
@@ -193,18 +187,18 @@ class UsersController extends AppController
 
         $users = $this->paginate($query);
 
-        $this->set('conditions', $this->conditions);
+        $this->set('keywordlist', $this->keywordlist);
         $data = $this->unpackKeywords($search_keyword);
         $this->set(compact('users', 'data', 'player', 'activeonly', 'information'));
     }
 
-    public function offer($id1, $id2)
+    public function makeMatch($senderid, $recieverid)
     {
-        if($id1 != $id2){
-            $player1 = $this->Users->get($id1);
-            $player2 = $this->Users->get($id2);
-            $this->sendMatchRequest($player1, $player2);
-            $this->Flash->success("Send DM to".$player1['handlename']." for make match with ".$player2['handlename']);
+        if($senderid != $recieverid){
+            $sender = $this->Users->get($senderid);
+            $reciever = $this->Users->get($recieverid);
+            $this->offer($sender, $reviever);
+            $this->Flash->success("Send DM to".$sender['handlename']." for make match with ".$reciever['handlename']);
         }
         return $this->redirect($this->request->referer());
     }
@@ -260,22 +254,21 @@ class UsersController extends AppController
         }
     }
 
-    private function sendMatchRequest($sender, $target){
+    private function offer($sender, $reciever){
 
         $twitter = $this->createTwitterOAuth();
 
-        $dmto = $target->twitter_account;
+        $dmto = $reciever->twitter_account;
         $message = $sender['handlename']."(@".$sender['twitter_account'].")さんから対戦のお誘いがあります。\r\n";
         $message = $message . "「". mb_substr($sender['comment'],0,64). "」\r\n";
         $message = $message . "Skype ID:". $sender['skype_account']."\r\n";
 
         $userinfo = $twitter->get('users/show',['screen_name'=>$dmto]);
-        $url = "http://plumbline.xsrv.jp/bsmh";//CORE_PATH;
 
         if($userinfo==null){
             $this->Flash->error(__($dmto.'のIDが見つかりません。'));
         }else{
-            $this->log($userinfo);
+            //$this->log($userinfo);
             $ctas = [
                 [
                     "type" => "web_url",
@@ -303,7 +296,7 @@ class UsersController extends AppController
             ];
             if(TWITTER_SUPPORT=='ENABLE'){
                 $response = $twitter->post('direct_messages/events/new', $params, true);
-                $this->log($response);
+                //$this->log($response);
             }
         }
     }
@@ -371,9 +364,9 @@ class UsersController extends AppController
     {
         $target = $this->Users->get($id,['contain' => ['Friends']]);
         $sender = $this->Auth->user();
-        $this->log("DM:".$sender['handlename']." to ".$target['handlename']);
+        //$this->log("DM:".$sender['handlename']." to ".$target['handlename']);
         if($target['use_friends']!='CLOSE' || (in_array($sender['id'], array_column($target->friends,'user_id')))){
-            $this->sendMatchRequest($sender, $target);
+            $this->offer($sender, $target);
             $this->Flash->success("Sent DM to ".__($target['handlename']));
         }
         else{
@@ -401,7 +394,7 @@ class UsersController extends AppController
             $this->Flash->error(__('The user could not be saved. Please, try again.'));
         }
 
-        $this->set('keywords', $this->conditions);
+        $this->set('keywords', $this->keywordlist);
         $this->set('data',$this->unpackKeywords($user['keyword']));
         $this->set(compact('user'));
     }
@@ -432,7 +425,7 @@ class UsersController extends AppController
                 $this->Flash->error(__('The user could not be saved. Please, try again.'));
             }
         }
-        $this->set('keywords', $this->conditions);
+        $this->set('keywords', $this->keywordlist);
         $this->set('data',$this->unpackKeywords($user['keyword']));
         $this->set(compact('user'));
     }
