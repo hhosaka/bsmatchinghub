@@ -46,7 +46,9 @@
                     <?= $this->Html->link(__('[Select]'), ['action' => 'admin', $user->id]) ?>
                     <?= $this->Html->link(__('[Offer]'), ['action' => 'makeMatch', $player->id, $user->id]) ?>
                     <?= $this->Html->link(__('[Deactivate]'), ['action' => 'deactivate', $user->id]) ?>
-                    <?= $this->Html->link(__('[delete]'), ['action' => 'delete', $user->id]) ?>
+                    <?= $this->Html->link(__('[delete]'), 
+                        ['action' => 'delete', $user->id],
+                        ['confirm' => __('Are you sure you want to delete {0}?', $user->handlename)]) ?>
                 </td>
             </tr>
             <?php endforeach; ?>
