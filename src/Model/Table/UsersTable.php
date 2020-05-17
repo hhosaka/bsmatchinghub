@@ -110,11 +110,6 @@ class UsersTable extends Table
             ->allowEmptyString('twitter_account');
 
         $validator
-            ->scalar('twitter_handle_name')
-            ->maxLength('twitter_handle_name', 128)
-            ->allowEmptyString('twitter_handle_name');
-
-        $validator
             ->scalar('comment')
             ->maxLength('comment', 1024);
 

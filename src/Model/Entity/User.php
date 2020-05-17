@@ -52,7 +52,7 @@ class User extends Entity
         'accept' => true,
         'skype_account' => true,
         'twitter_account' => true,
-        'twitter_handle_name' => true,
+        'twitterid' => true,
         'comment' => true,
         'short_comment' => true,
         'keyword' => true,

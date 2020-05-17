@@ -70,17 +70,26 @@ class UsersController extends AppController
         $user = $this->Users->newEntity();
         if ($this->request->is('post')) {
             $data = $this->request->getData();
-            if($data['accept']){
-                $user = $this->Users->patchEntity($user, $data);
-                $user['role'] = 'guest';
-                if ($this->Users->save($user)) {
-                    $this->Flash->success(__($user['handlename'].'さんのアカウントを登録しました。'));
-                    $this->Auth->setUser($user);
-                    return $this->redirect($this->request->getQuery('redirectUrl'));
-                }
-                $this->Flash->error(__('アカウントは登録できませんでした。'));
-            }else{
+            if(!$data['accept']){
                 $this->Flash->error(__('登録の為には利用規約への同意が必要です。'));
+            }
+            else{
+                $info = $this->getUSerInfo($data['twitter_account']);
+                if($info==null){
+                    $this->Flash->error(__('TwitterのIDの存在が確認できませんでした。'));
+                }
+                else{
+                    $user = $this->Users->patchEntity($user, $data);
+                    $user['role'] = 'guest';
+                    $user['handlename'] = $info->name;
+                    $user['twitterid'] = $info->id;
+                    if ($this->Users->save($user)) {
+                        $this->Flash->success(__($user['handlename'].'さんのアカウントを登録しました。'));
+                        $this->Auth->setUser($user);
+                        return $this->redirect($this->request->getQuery('redirectUrl'));
+                    }
+                    $this->Flash->error(__('アカウントは登録できませんでした。'));
+                }
             }
         }
         $this->set(compact('user'));
@@ -237,7 +246,14 @@ class UsersController extends AppController
 
     private function getUserInfo($account){
         $twitter = $this->createTwitterOAuth();
-        return $twitter->get('users/show',['screen_name'=>$account]);
+        $info = $twitter->get('users/show',['screen_name'=>$account]);
+        if($twitter->getLastHttpcode()==200){
+            // $this->log($info);
+            return $info;
+        }
+        else{
+            return null;
+        }
     }
 
     private function postTweet($message){
@@ -251,15 +267,14 @@ class UsersController extends AppController
 
         $twitter = $this->createTwitterOAuth();
 
-        $dmto = $reciever->twitter_account;
         $message = $sender['handlename']."(@".$sender['twitter_account'].")さんから対戦のお誘いがあります。\r\n";
         $message = $message . "「". mb_substr($sender['comment'],0,64). "」\r\n";
         $message = $message . "Skype ID:". $sender['skype_account']."\r\n";
 
-        $userinfo = $twitter->get('users/show',['screen_name'=>$dmto]);
+        $userinfo = $this->getUserInfo($reciever->twitter_account);
 
         if($userinfo==null){
-            $this->Flash->error(__($dmto.'のIDが見つかりません。'));
+            $this->Flash->error(__($reciever->handlename.'のIDが見つかりません。'));
         }else{
             //$this->log($userinfo);
             $ctas = [
@@ -289,7 +304,7 @@ class UsersController extends AppController
             ];
             if(TWITTER_SUPPORT=='ENABLE'){
                 $response = $twitter->post('direct_messages/events/new', $params, true);
-                //$this->log($response);
+                $this->log($response);
             }
         }
     }
@@ -315,9 +330,7 @@ class UsersController extends AppController
     
             $message = $sender['handlename']."さんより、メッセージがあります。\r\n「".$data['message']."」";
 
-            $twitter = $this->createTwitterOAuth();
-
-            $userinfo = $twitter->get('users/show',['screen_name'=>$reciever->twitter_account]);
+            $userinfo = $this->getUserInfo($reciever->twitter_account);
 
             $params = [
                 'event' => [
@@ -333,7 +346,7 @@ class UsersController extends AppController
                 ]
             ];
             if(TWITTER_SUPPORT=='ENABLE'){
-                $response = $twitter->post('direct_messages/events/new', $params, true);
+                $response = $this->createTwitterOAuth()->post('direct_messages/events/new', $params, true);
                 //$this->log($response);
             }
     
@@ -347,15 +360,11 @@ class UsersController extends AppController
         $sender = $this->Users->get($senderid);
         $reciever = $this->Users->get($this->Auth->user()['id']);
 
-        $twitter = $this->createTwitterOAuth();
-
-        $dmto = $sender->twitter_account;
         $message = $reciever['handlename']."さんより、対戦辞退される旨連絡が入りました。\r\n申し訳ありません。";
-
-        $userinfo = $twitter->get('users/show',['screen_name'=>$dmto]);
+        $userinfo = $this->getUserInfo($sender->twitter_account);
 
         if($userinfo==null){
-            $this->Flash->error(__($dmto.'のIDが見つかりません。'));
+            $this->Flash->error(__($sender->handlename.'のIDが見つかりません。'));
         }else{
             $params = [
                 'event' => [
@@ -371,7 +380,7 @@ class UsersController extends AppController
                 ]
             ];
             if(TWITTER_SUPPORT=='ENABLE'){
-                $response = $twitter->post('direct_messages/events/new', $params, true);
+                $response = $this->createTwitterOAuth()->post('direct_messages/events/new', $params, true);
                 //$this->log($response);
             }
         }

@@ -24,10 +24,8 @@
         <?php
             echo $this->Form->control('username',['type'=>'email','label'=>'メールアドレス']);
             echo $this->Form->control('password',['label'=>'パスワード']);
-            echo $this->Form->control('handlename',['label'=>'ハンドルネーム（この名前が公開されます）']);
             echo $this->Form->control('skype_account',['label'=>'Skype ID']);
             echo $this->Form->control('twitter_account',['label'=>'Twitter ID']);
-            echo $this->Form->control('twitter_handle_name',['label'=>'Twitterのハンドルネーム']);
             echo $this->Form->control('use_friends',[
                 'label'=>'フレンド設定',
                 'type'=>'select',
