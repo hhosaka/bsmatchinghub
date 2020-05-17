@@ -46,6 +46,7 @@
                         ['action' => 'requestMatch', $user->id],
                         ['confirm' => __('Are you sure you want to send matching request to # {0}?', $user->handlename)]
                     ) ?>
+                    <?= $this->Html->link(__('[DM]'), ['action' => 'senddm', $user->id]) ?>
                 </td>
             </tr>
             <?php endforeach; ?>

@@ -37,7 +37,7 @@ class UsersController extends AppController
     public function isAuthorized($user = null)
     {
         $action = $this->request->getParam('action');
-        if(in_array($action,['index','activate','deactivateSelf','settings','requestMatch','view','accept','reject','deleteSelf'])){
+        if(in_array($action,['index','activate','deactivateSelf','settings','requestMatch','view','accept','reject','deleteSelf','senddm'])){
                 return true;
         }
         return parent::isAuthorized($user);
@@ -203,13 +203,6 @@ class UsersController extends AppController
         return $this->redirect($this->request->referer());
     }
 
-    /**
-     * View method
-     *
-     * @param string|null $id User id.
-     * @return \Cake\Http\Response|null
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function view($id = null)
     {
         $owner = $this->Auth->user();
@@ -312,6 +305,42 @@ class UsersController extends AppController
         $result = true;
 
         $this->set(compact('sender', 'result'));
+    }
+
+    public function senddm($id=null){
+        $sender = $this->Users->get($this->Auth->user()['id']);
+        $reciever = $this->Users->get($id);
+        if($this->request->is('post')){
+            $data = $this->request->getData();
+    
+            $message = $sender['handlename']."さんより、メッセージがあります。\r\n「".$data['message']."」";
+
+            $twitter = $this->createTwitterOAuth();
+
+            $userinfo = $twitter->get('users/show',['screen_name'=>$reciever->twitter_account]);
+
+            $params = [
+                'event' => [
+                    'type' => 'message_create',
+                    'message_create' => [
+                        'target' => [
+                            'recipient_id' => $userinfo->id
+                        ],
+                        'message_data' => [
+                            "text" => $message,
+                        ]
+                    ]
+                ]
+            ];
+            if(TWITTER_SUPPORT=='ENABLE'){
+                $response = $twitter->post('direct_messages/events/new', $params, true);
+                //$this->log($response);
+            }
+    
+            $this->Flash->success('Sent message');
+            return $this->redirect(['action' => 'index']);
+        }
+        $this->set(compact('reciever'));
     }
 
     public function reject($senderid){
