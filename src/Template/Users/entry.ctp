@@ -11,7 +11,7 @@
         <legend><?= __('ユーザー登録') ?></legend>
         <?php
             echo $this->Form->control('username',['type'=>'email', 'label'=>'メールアドレス']);
-            echo $this->Form->control('password',['label'=>'パスワード']);
+            echo $this->Form->control('password',['label'=>'パスワード']); 
             echo $this->Form->control('skype_account',['label'=>'Skype ID']);
             echo $this->Form->control('twitter_account',['label'=>'Twitter ID']);
             echo $this->Form->control('comment',['label'=>'コメント']);

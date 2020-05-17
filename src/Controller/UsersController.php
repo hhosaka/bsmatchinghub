@@ -201,6 +201,21 @@ class UsersController extends AppController
         $this->set(compact('users', 'data', 'player', 'activeonly', 'information'));
     }
 
+    public function updateid(){
+        $this->log('updateid');
+        foreach($this->Users->find('all') as $user){
+            $info = $this->getUserInfo($user->twitter_account);
+            $this->log($user->handlename);
+            if($info!=null){
+                $this->log($info->name);
+                $user['handlename']=$info->name;
+                $user['twitterid'] = $info->id;
+                $this->Users->save($user);
+            }
+        }
+        $this->redirect(['action'=>'index']);
+    }
+
     public function makeMatch($senderid, $recieverid)
     {
         if($senderid != $recieverid){
@@ -256,6 +271,30 @@ class UsersController extends AppController
         }
     }
 
+    private function senddirectmessage($twitterid, $message, $ctas=null){
+        $params = [
+            'event' => [
+                'type' => 'message_create',
+                'message_create' => [
+                    'target' => [
+                        'recipient_id' => $twitterid
+                    ],
+                    'message_data' => [
+                        "text" => $message,
+                        "ctas" => $ctas,
+                    ]
+                ]
+            ]
+        ];
+
+        $this->log($ctas);
+
+        if(TWITTER_SUPPORT=='ENABLE'){
+            $response = $this->createTwitterOAuth()->post('direct_messages/events/new', $params, true);
+            $this->log($response);
+        }
+    }
+
     private function postTweet($message){
         if(TWITTER_SUPPORT=='ENABLE'){
             $response = $this->createTwitterOAuth()->post("statuses/update", ["status" => $message]);
@@ -265,48 +304,23 @@ class UsersController extends AppController
 
     private function offer($sender, $reciever){
 
-        $twitter = $this->createTwitterOAuth();
-
         $message = $sender['handlename']."(@".$sender['twitter_account'].")さんから対戦のお誘いがあります。\r\n";
-        $message = $message . "「". mb_substr($sender['comment'],0,64). "」\r\n";
-        $message = $message . "Skype ID:". $sender['skype_account']."\r\n";
+        $message .= "「". mb_substr($sender['comment'],0,64). "」\r\n";
+        $message .=  "Skype ID:". $sender['skype_account']."\r\n";
 
-        $userinfo = $this->getUserInfo($reciever->twitter_account);
+        $ctas = [
+            [
+                "type" => "web_url",
+                "label" => "対戦します",
+                "url" => CORE_PATH_FOR_DM."/users/accept/".$sender['id']
+            ], [
+                "type" => "web_url",
+                "label" => "お断りします",
+                "url" => CORE_PATH_FOR_DM."/users/reject/".$sender['id']
+            ]
+        ];
 
-        if($userinfo==null){
-            $this->Flash->error(__($reciever->handlename.'のIDが見つかりません。'));
-        }else{
-            //$this->log($userinfo);
-            $ctas = [
-                [
-                    "type" => "web_url",
-                    "label" => "対戦します",
-                    "url" => CORE_PATH_FOR_DM."/users/accept/".$sender['id']
-                ], [
-                    "type" => "web_url",
-                    "label" => "お断りします",
-                    "url" => CORE_PATH_FOR_DM."/users/reject/".$sender['id']
-                ]
-            ];
-            $params = [
-                'event' => [
-                    'type' => 'message_create',
-                    'message_create' => [
-                        'target' => [
-                            'recipient_id' => $userinfo->id
-                        ],
-                        'message_data' => [
-                            "text" => $message,
-                            "ctas" => $ctas
-                        ]
-                    ]
-                ]
-            ];
-            if(TWITTER_SUPPORT=='ENABLE'){
-                $response = $twitter->post('direct_messages/events/new', $params, true);
-                $this->log($response);
-            }
-        }
+        $this->senddirectmessage($reciever->twitterid, $message, $ctas);
     }
 
     public function accept($senderid){
@@ -330,27 +344,9 @@ class UsersController extends AppController
     
             $message = $sender['handlename']."さんより、メッセージがあります。\r\n「".$data['message']."」";
 
-            $userinfo = $this->getUserInfo($reciever->twitter_account);
-
-            $params = [
-                'event' => [
-                    'type' => 'message_create',
-                    'message_create' => [
-                        'target' => [
-                            'recipient_id' => $userinfo->id
-                        ],
-                        'message_data' => [
-                            "text" => $message,
-                        ]
-                    ]
-                ]
-            ];
-            if(TWITTER_SUPPORT=='ENABLE'){
-                $response = $this->createTwitterOAuth()->post('direct_messages/events/new', $params, true);
-                //$this->log($response);
-            }
-    
+            $this->senddirectmessage($reciever->twitterid, $message);
             $this->Flash->success('Sent message');
+
             return $this->redirect(['action' => 'index']);
         }
         $this->set(compact('reciever'));
@@ -361,29 +357,8 @@ class UsersController extends AppController
         $reciever = $this->Users->get($this->Auth->user()['id']);
 
         $message = $reciever['handlename']."さんより、対戦辞退される旨連絡が入りました。\r\n申し訳ありません。";
-        $userinfo = $this->getUserInfo($sender->twitter_account);
 
-        if($userinfo==null){
-            $this->Flash->error(__($sender->handlename.'のIDが見つかりません。'));
-        }else{
-            $params = [
-                'event' => [
-                    'type' => 'message_create',
-                    'message_create' => [
-                        'target' => [
-                            'recipient_id' => $userinfo->id
-                        ],
-                        'message_data' => [
-                            "text" => $message
-                        ]
-                    ]
-                ]
-            ];
-            if(TWITTER_SUPPORT=='ENABLE'){
-                $response = $this->createTwitterOAuth()->post('direct_messages/events/new', $params, true);
-                //$this->log($response);
-            }
-        }
+        $this->senddirectmessage($sender->twitterid, $message);
     }
 
     private function postActivateMessage($user){
@@ -398,17 +373,24 @@ class UsersController extends AppController
         $this->postTweet($message);
     }
 
+    private function canAccess($sender, $reciever){
+        if($reciever['use_friends']!='CLOSE' || (in_array($sender['id'], array_column($reciever->friends,'user_id')))){
+            return true;
+        }else{
+            $this->Flash->error(__($reciever['handlename'].'さんはCLOSE設定になっています。'));
+            return false;
+        }
+
+    }
+
     public function requestMatch($id = null)
     {
         $sender = $this->Auth->user();
         $reciever = $this->Users->get($id,['contain' => ['Friends']]);
         //$this->log("DM:".$sender['handlename']." to ".$target['handlename']);
-        if($reciever['use_friends']!='CLOSE' || (in_array($sender['id'], array_column($reciever->friends,'user_id')))){
+        if($this->canAccess($sender, $reciever)){
             $this->offer($sender, $reciever);
             $this->Flash->success("Sent DM to ".__($reciever['handlename']));
-        }
-        else{
-            $this->Flash->error(__($reciever['handlename'].'さんのフレンドに登録されていないので送信できませんでした。'));
         }
         return $this->redirect($this->request->referer());
     }
