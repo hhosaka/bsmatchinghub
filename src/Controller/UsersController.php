@@ -222,7 +222,7 @@ class UsersController extends AppController
             $sender = $this->Users->get($senderid);
             $reciever = $this->Users->get($recieverid);
             $this->offer($sender, $reciever);
-            $this->Flash->success("Send DM to".$sender['handlename']." for make match with ".$reciever['handlename']);
+            $this->Flash->success("Send DM to".$reciever['handlename']." for make match with ".$sender['handlename']);
         }
         return $this->redirect($this->request->referer());
     }
@@ -333,6 +333,8 @@ class UsersController extends AppController
         $this->Users->save($reciever);
         $result = true;
 
+        $this->postTweet($sender['handlename'].'さんと'.$reciever['handlename'].'さんの対戦が始まりました。');
+
         $this->set(compact('sender', 'result'));
     }
 
@@ -356,7 +358,7 @@ class UsersController extends AppController
         $sender = $this->Users->get($senderid);
         $reciever = $this->Users->get($this->Auth->user()['id']);
 
-        $message = $reciever['handlename']."さんより、対戦辞退される旨連絡が入りました。\r\n申し訳ありません。";
+        $message = $reciever['handlename']."さんより、対戦辞退される旨連絡が入りました。";
 
         $this->senddirectmessage($sender->twitterid, $message);
     }

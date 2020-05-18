@@ -11,7 +11,7 @@
     </ul>
 </nav>
 <div class="users index large-9 medium-8 columns content">
-    <?='Target:'.$player->handlename?>
+    <?='Selected:'.$player->handlename?>
     <table cellpadding="0" cellspacing="0">
         <thead>
             <tr>
