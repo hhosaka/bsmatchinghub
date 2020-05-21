@@ -71,7 +71,7 @@
     <?=$this->Form->control('leadtime',[
                 'label'=>'リードタイム',
                 'type'=>'select',
-                'default'=>'+60 minute',
+                'value'=>$data['leadtime'],
                 'options'=>[
                     'now'=>'現在',
                     '+60 minute'=>'１時間後まで含める',
@@ -83,7 +83,7 @@
     <div style="display:inline-flex">
     <?php $i=0; foreach ($keywordlist as $keyword):?>
         <?=$this->Form->control('keyword'.$i ,['type'=>'checkbox','label'=>$keyword,'checked'=>$data['keyword'.$i]]); $i=$i+1 ?>
-        <?php if($i%4==3):?>
+        <?php if($i%2==0):?>
             </div><br><div style="display:inline-flex">
         <?php endif?>
     <?php endforeach ?>

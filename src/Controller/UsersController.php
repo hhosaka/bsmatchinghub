@@ -95,7 +95,9 @@ class UsersController extends AppController
         $this->set(compact('user'));
     }
 
-    private function convKeywords2Conds($keywords){
+    private function convKeywords2Conds($data){
+        $list = explode(";", $data);
+        $keywords = $list[0];
         $conds = null;
         foreach(explode("|", $keywords) as $keyword){
             $conds[] = ['keyword LIKE'=>'%'.$keyword.'%'];
@@ -103,9 +105,15 @@ class UsersController extends AppController
         return $conds;
     }
 
-    private function unpackKeywords($keywords){
+    private function unpackKeywords($data){
         $keywordlist = $this->keywordlist;
-        $buf = null;
+        $list = explode(";", $data);
+        $keywords = $list[0];
+        if(count($list)<2){
+            $buf['leadtime'] = '+60 minute';
+        }else{
+            $buf['leadtime'] = $list[1];
+        }
         for($i=0; $i < count($keywordlist); ++$i){
             $buf['keyword'.$i] = strpos($keywords, $keywordlist[$i]);
         }
@@ -121,9 +129,9 @@ class UsersController extends AppController
         return $buf;
     }
 
-    private function packKeyword($data, $others){
+    private function packKeyword($data){
         $keywordlist = $this->keywordlist;
-        $buf = $others;
+        $buf = $data['others'];
         for($i=0; $i < count($keywordlist); ++$i){
             if($data['keyword'.$i]){
                 $keyword = $keywordlist[$i];
@@ -132,6 +140,9 @@ class UsersController extends AppController
                 }
             }
         }
+        if(array_key_exists('leadtime', $data)){
+            $buf.= ';'.$data['leadtime'];
+        }
         return $buf;
     }
 
@@ -139,22 +150,25 @@ class UsersController extends AppController
     {
         $user = $this->Users->get($this->Auth->user()['id']);
 
-        $conds[]=['Users.id !='=>$user['id']];// 本人は除く
-        $conds[]=['status'=>'active']; // アクティブのみ
-        $conds[]=['end_time >='=> date("Y/m/d H:i:s")];//　終了したものは除く
-        $leadtime = '+60 minute';// 開始一時間前まで
         if($this->request->is('post')){
             $data = $this->request->getData();
-            $leadtime = $data['leadtime'];
-            $user['search_keyword'] = $this->packKeyword($data, $data['others']);
+            $user['search_keyword'] = $this->packKeyword($data);
             $this->Users->save($user);
+            return $this->redirect(['?'=>['page'=>'1']]);
         }
-        $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime($leadtime))];
-        $conds = array_merge($conds, $this->convKeywords2Conds($user['search_keyword']));
+        $data = $this->unpackKeywords($user['search_keyword']);
+        $conds = $this->convKeywords2Conds($user['search_keyword']);
+        if($data['leadtime']!='all'){
+            $this->log('step2');
+            $conds[]=['Users.id !='=>$user['id']];// 本人は除く
+            $conds[]=['status'=>'active']; // アクティブのみ
+            $conds[]=['end_time >='=> date("Y/m/d H:i:s")];//　終了したものは除く
+            $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime($data['leadtime']))];
+        }
 
         $query = $this->Users
             ->find('all',[
-                'fields'=>['Users.id','Blacks.id','handlename','start_time','end_time','comment'],
+                'fields'=>['Users.id','Blacks.id','handlename','start_time','end_time','comment','skype_account','twitter_account'],
                 'conditions'=>['and'=>[$conds]]])
             ->leftJoinWith('Blacks')
             ->group('Users.id')
@@ -164,41 +178,20 @@ class UsersController extends AppController
 
         $this->set('information', file_get_contents($this->informationfile));
         $this->set('keywordlist', $this->keywordlist);
-        $data = $this->unpackKeywords($user['search_keyword']);
         $this->set(compact('user', 'users','data'));
     }
 
     public function admin($id=1)
     {
-        $player = $this->Users->get($id);
-        $search_keyword ='';
-        $activeonly = true;
+        $this->index();
 
         if($this->request->is('post')){
             $data = $this->request->getData();
-            $search_keyword = $this->packKeyword($data, $data['others']);
-            $activeonly = $data['activeonly'];
             file_put_contents($this->informationfile, $data['information']);
         }
+
         $information = file_get_contents($this->informationfile);
-
-        $conds = $this->convKeywords2Conds($search_keyword);
-        if($activeonly){
-            $conds[]=['status'=>'active']; // アクティブのみ
-            $conds[]=['start_time <'=> date("Y/m/d H:i:s",strtotime('now'))];
-            $conds[]=['end_time >='=> date("Y/m/d H:i:s")];//　終了したものは除く
-        }
-
-        $query = $this->Users
-            ->find('all',[
-                'fields'=>['Users.id','handlename','end_time','comment','skype_account','twitter_account'],
-                'conditions'=>['and'=>[$conds]]]);
-
-        $users = $this->paginate($query);
-
-        $this->set('keywordlist', $this->keywordlist);
-        $data = $this->unpackKeywords($search_keyword);
-        $this->set(compact('users', 'data', 'player', 'activeonly', 'information'));
+        $this->set('player',$this->Users->get($id));
     }
 
     public function updateid(){
@@ -407,7 +400,7 @@ class UsersController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
             $user = $this->Users->patchEntity($user, $data);
-            $user['keyword'] = $this->packKeyword($data,$data['others']);
+            $user['keyword'] = $this->packKeyword($data);
             if ($this->Users->save($user)) {
                 $this->Flash->success(__('The user has been saved.'));
 
@@ -432,7 +425,7 @@ class UsersController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
             $user = $this->Users->patchEntity($user, $data);
-            $user['keyword'] = $this->packKeyword($data, $data['others']);
+            $user['keyword'] = $this->packKeyword($data);
             $user['end_time'] = new Time($user['start_time']." ".$data['time']);
             $user['status'] = 'ACTIVE';
             if ($this->Users->save($user)) {

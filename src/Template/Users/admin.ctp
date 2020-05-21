@@ -70,16 +70,27 @@
 
     <?=$this->Form->create() ?>
     <fieldset>
+    <?=$this->Form->control('leadtime',[
+                'label'=>'リードタイム',
+                'type'=>'select',
+                'value'=>$data['leadtime'],
+                'options'=>[
+                    'all'=>'ALL',
+                    'now'=>'現在',
+                    '+60 minute'=>'１時間後まで含める',
+                    '+120 minute'=>'2時間後まで含める',
+                    '+180 minute'=>'3時間後まで含める',
+                    '+1 day'=>'一日後まで含める',]
+                ]);?>
     <?=$this->Form->control('others',['label'=>'Keyword','value'=>$data['others']]) ?>
     <div style="display:inline-flex">
     <?php $i=0; foreach ($keywordlist as $keyword):?>
         <?=$this->Form->control('keyword'.$i ,['type'=>'checkbox','label'=>$keyword,'checked'=>$data['keyword'.$i]]); $i=$i+1 ?>
-        <?php if($i%4==3):?>
+        <?php if($i%2==0):?>
             </div><br><div style="display:inline-flex">
         <?php endif?>
     <?php endforeach ?>
     </div>
-    <?=$this->Form->control('activeonly',['type'=>'checkbox', 'label'=>'Active Only', 'checked'=>$activeonly]) ?>
     <?=$this->Form->control('information',['type'=>'textarea', 'label'=>'Information', 'row'=>'5', 'value'=>$information]) ?>
     </fieldset>
     <?=$this->Form->button("Send")?>
