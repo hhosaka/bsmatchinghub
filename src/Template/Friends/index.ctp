@@ -22,7 +22,7 @@
         <tbody>
             <?php foreach ($friends as $friend): ?>
             <tr>
-                <td><?= $friend->has('user') ? $this->Html->link($friend->user->handlename, ['controller' => 'Users', 'action' => 'viewUser', $friend->user->id]) : '' ?></td>
+                <td><?= $friend->has('user') ? $this->Html->link($friend->user->handlename, ['controller' => 'Users', 'action' => 'view', $friend->user->id]) : '' ?></td>
                 <td class="actions">
                     <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $friend->id], ['confirm' => __('Are you sure you want to delete # {0}?', $friend->user->handlename)]) ?>
                 </td>
