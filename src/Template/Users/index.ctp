@@ -73,6 +73,7 @@
                 'type'=>'select',
                 'value'=>$data['leadtime'],
                 'options'=>[
+                    'all'=>'ALL',
                     'now'=>'現在',
                     '+60 minute'=>'１時間後まで含める',
                     '+120 minute'=>'2時間後まで含める',
