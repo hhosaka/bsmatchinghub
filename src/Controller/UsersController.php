@@ -215,7 +215,8 @@ class UsersController extends AppController
             $sender = $this->Users->get($senderid);
             $reciever = $this->Users->get($recieverid);
             $this->offer($sender, $reciever);
-            $this->Flash->success("Send DM to".$reciever['handlename']." for make match with ".$sender['handlename']);
+            $this->offer($reciever, $sender);
+            $this->Flash->success("Sent DM both players");
         }
         return $this->redirect($this->request->referer());
     }
