@@ -12,6 +12,14 @@ use App\Controller\AppController;
  */
 class QueuesController extends AppController
 {
+    public function isAuthorized($user = null)
+    {
+        $action = $this->request->getParam('action');
+        if(in_array($action,['index','entry','add','delete','changeStatus'])){
+                return true;
+        }
+        return parent::isAuthorized($user);
+    }
     /**
      * Index method
      *
@@ -72,24 +80,24 @@ class QueuesController extends AppController
      * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function edit($id = null)
-    {
-        $queue = $this->Queues->get($id, [
-            'contain' => [],
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $queue = $this->Queues->patchEntity($queue, $this->request->getData());
-            if ($this->Queues->save($queue)) {
-                $this->Flash->success(__('The queue has been saved.'));
+    // public function edit($id = null)
+    // {
+    //     $queue = $this->Queues->get($id, [
+    //         'contain' => [],
+    //     ]);
+    //     if ($this->request->is(['patch', 'post', 'put'])) {
+    //         $queue = $this->Queues->patchEntity($queue, $this->request->getData());
+    //         if ($this->Queues->save($queue)) {
+    //             $this->Flash->success(__('The queue has been saved.'));
 
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The queue could not be saved. Please, try again.'));
-        }
-        $eventers = $this->Queues->Eventers->find('list', ['limit' => 200]);
-        $users = $this->Queues->Users->find('list', ['limit' => 200]);
-        $this->set(compact('queue', 'eventers', 'users'));
-    }
+    //             return $this->redirect(['action' => 'index']);
+    //         }
+    //         $this->Flash->error(__('The queue could not be saved. Please, try again.'));
+    //     }
+    //     $eventers = $this->Queues->Eventers->find('list', ['limit' => 200]);
+    //     $users = $this->Queues->Users->find('list', ['limit' => 200]);
+    //     $this->set(compact('queue', 'eventers', 'users'));
+    // }
 
     /**
      * Delete method

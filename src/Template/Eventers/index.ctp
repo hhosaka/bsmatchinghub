@@ -35,7 +35,7 @@
                 <td><?= count(array_keys(array_column($eventer->queues,'status'),'LOSE'))?></td>
                 <td class="actions">
                     <?= $this->Html->link('Visit', $eventer->user->twicas_url)?>
-                    <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $eventer->id], ['confirm' => __('Are you sure you want to delete # {0}?', $eventer->id)]) ?>
+                    <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $eventer->id], ['confirm' => __('Are you sure you want to delete # {0}?', $eventer->user->handlename)]) ?>
                 </td>
             </tr>
             <?php endforeach; ?>

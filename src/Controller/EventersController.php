@@ -12,6 +12,14 @@ use App\Controller\AppController;
  */
 class EventersController extends AppController
 {
+    public function isAuthorized($user = null)
+    {
+        $action = $this->request->getParam('action');
+        if(in_array($action,['index','view','add','delete'])){
+                return true;
+        }
+        return parent::isAuthorized($user);
+    }
     /**
      * Index method
      *
@@ -76,17 +84,6 @@ class EventersController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
-    public function entry($eventerid=null)
-    {
-        $queue = $this->Queues->newEntity();
-        $queue['eventer_id'] = $eventerid;
-        $queue['user_id']=$this->Auth->user()['id'];
-        if (!$this->Eventers->save($eventer)) {
-            $this->Flash->error(__('The eventer could not be saved. Please, try again.'));
-        }
-        return $this->redirect(['action' => 'view',$eventerid]);
-    }
-
     /**
      * Edit method
      *
@@ -94,23 +91,23 @@ class EventersController extends AppController
      * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function edit($id = null)
-    {
-        $eventer = $this->Eventers->get($id, [
-            'contain' => [],
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $eventer = $this->Eventers->patchEntity($eventer, $this->request->getData());
-            if ($this->Eventers->save($eventer)) {
-                $this->Flash->success(__('The eventer has been saved.'));
+    // public function edit($id = null)
+    // {
+    //     $eventer = $this->Eventers->get($id, [
+    //         'contain' => [],
+    //     ]);
+    //     if ($this->request->is(['patch', 'post', 'put'])) {
+    //         $eventer = $this->Eventers->patchEntity($eventer, $this->request->getData());
+    //         if ($this->Eventers->save($eventer)) {
+    //             $this->Flash->success(__('The eventer has been saved.'));
 
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The eventer could not be saved. Please, try again.'));
-        }
-        $users = $this->Eventers->Users->find('list', ['limit' => 200]);
-        $this->set(compact('eventer', 'users'));
-    }
+    //             return $this->redirect(['action' => 'index']);
+    //         }
+    //         $this->Flash->error(__('The eventer could not be saved. Please, try again.'));
+    //     }
+    //     $users = $this->Eventers->Users->find('list', ['limit' => 200]);
+    //     $this->set(compact('eventer', 'users'));
+    // }
 
     /**
      * Delete method
