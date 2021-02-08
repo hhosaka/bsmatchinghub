@@ -52,6 +52,7 @@ class User extends Entity
         'accept' => true,
         'skype_account' => true,
         'twitter_account' => true,
+        'twicas_url' => true,
         'twitterid' => true,
         'comment' => true,
         'short_comment' => true,

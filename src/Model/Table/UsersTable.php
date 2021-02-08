@@ -107,7 +107,12 @@ class UsersTable extends Table
         $validator
             ->scalar('twitter_account')
             ->maxLength('twitter_account', 128)
-            ->allowEmptyString('twitter_account');
+            ->notEmptyString('twitter_account');
+
+        $validator
+            ->scalar('twicas_url')
+            ->maxLength('twicas_url', 128)
+            ->allowEmptyString('twicas_url');
 
         $validator
             ->scalar('comment')

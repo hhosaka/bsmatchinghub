@@ -26,6 +26,7 @@
             echo $this->Form->control('password',['label'=>'パスワード']);
             echo $this->Form->control('skype_account',['label'=>'Skype ID']);
             echo $this->Form->control('twitter_account',['label'=>'Twitter ID']);
+            echo $this->Form->control('twicas_url',['label'=>'Twicas URL']);
             echo $this->Form->control('use_friends',[
                 'label'=>'フレンド設定',
                 'type'=>'select',

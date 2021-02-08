@@ -63,7 +63,7 @@ class UsersController extends AppController
     public function logout()
     {
         $this->request->getSession()->destroy();
-        return $this->redirect(['action'=>'index']);
+        return $this->redirect(['controller'=>'Eventers', 'action'=>'index']);
     }
 
     public function entry(){
