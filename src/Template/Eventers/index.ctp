@@ -7,9 +7,9 @@
 <nav class="large-3 medium-4 columns" id="actions-sidebar">
     <ul class="side-nav">
         <li class="heading"><?= __('Actions') ?></li>
-        <li><?= $this->Html->link(__('Initiate'), ['action' => 'add']) ?></li>
+        <li><?= $caninitiate ? $this->Html->link(__('Initiate'), ['action' => 'add']) : '' ?></li>
         <li><?= $this->Html->link(__('Settings'), ['controller' => 'Users', 'action' => 'settings']) ?></li>
-        <li><?= $this->Html->link(__('Logout'), ['controller' => 'Users', 'action' => 'logout']) ?></li>
+        <li><?= $this->Html->link(__('Logout'), ['controller' => 'Users', 'action' => 'logout'], ['confirm' => __('You may keep login. Are you sure you want to logout?')]) ?></li>
     </ul>
 </nav>
 <div class="eventers index large-9 medium-8 columns content">
@@ -17,11 +17,11 @@
     <table cellpadding="0" cellspacing="0">
         <thead>
             <tr>
-                <th scope="col"><?= $this->Paginator->sort('キャス主') ?></th>
-                <th scope="col" width='10%'><?= $this->Paginator->sort('待機') ?></th>
-                <th scope="col" width='10%'><?= $this->Paginator->sort('対戦中') ?></th>
-                <th scope="col" width='10%'><?= $this->Paginator->sort('勝ち') ?></th>
-                <th scope="col" width='10%'><?= $this->Paginator->sort('負け') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('TwitCasting Owner') ?></th>
+                <th scope="col" width='10%'><?= $this->Paginator->sort('Waiting') ?></th>
+                <th scope="col" width='10%'><?= $this->Paginator->sort('OnStage') ?></th>
+                <th scope="col" width='10%'><?= $this->Paginator->sort('Win') ?></th>
+                <th scope="col" width='10%'><?= $this->Paginator->sort('Lose') ?></th>
                 <th scope="col" width='10%' class="actions"><?= __('Actions') ?></th>
             </tr>
         </thead>

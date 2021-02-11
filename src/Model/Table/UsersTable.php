@@ -101,8 +101,7 @@ class UsersTable extends Table
         $validator
             ->scalar('skype_account')
             ->maxLength('skype_account', 128)
-            ->requirePresence('skype_account', 'create')
-            ->notEmptyString('skype_account');
+            ->allowEmptyString('skype_account');
 
         $validator
             ->scalar('twitter_account')
@@ -116,7 +115,8 @@ class UsersTable extends Table
 
         $validator
             ->scalar('comment')
-            ->maxLength('comment', 1024);
+            ->maxLength('comment', 1024)
+            ->allowEmptyString('comment');
 
         $validator
             ->scalar('short_comment')

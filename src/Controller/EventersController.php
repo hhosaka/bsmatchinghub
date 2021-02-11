@@ -31,8 +31,10 @@ class EventersController extends AppController
             'contain' => ['Users', 'Queues'],
         ];
         $eventers = $this->paginate($this->Eventers);
+        $user = $this->Auth->user();
+        $caninitiate = $user['twicas_url']!='' && $this->Eventers->find('all',['conditions'=>['user_id'=>$user['id']]])->first()==null;
 
-        $this->set(compact('eventers'));
+        $this->set(compact('eventers','caninitiate'));
     }
 
     /**
