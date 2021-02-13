@@ -7,7 +7,7 @@
 <nav class="large-3 medium-4 columns" id="actions-sidebar">
     <ul class="side-nav">
         <li class="heading"><?= __('Actions') ?></li>
-        <li><?= $canentry ? $this->Html->link(__('Entry'), ['controller'=>'Queues', 'action' => 'entry', $eventer->id]) : ''?> </li>
+        <li><?= $canentry ? $this->Html->link(__('Entry'), [ 'action' => 'entry', $eventer->id]) : ''?> </li>
         <li><?= $this->Html->link(__('Back'), [ 'action' => 'index']) ?> </li>
     </ul>
 </nav>
@@ -26,10 +26,10 @@
             <?php foreach ($eventer->queues as $queues): ?>
             <tr>
                 <td><?= h($queues->user->handlename) ?></td>
-                <td><?= $this->Html->link($queues->status, [ 'controller' => 'Queues', 'action' => 'change_status', $eventer->id, $queues->id]) ?></td>
+                <td><?= $this->Html->link($queues->status, [ 'action' => 'change_status', $eventer->id, $queues->id]) ?></td>
                 <td><?= h($queues->creation_date) ?></td>
                 <td class="actions">
-                    <?= $this->Form->postLink(__('Delete'), ['controller' => 'Queues', 'action' => 'delete', $eventer->id, $queues->id], ['confirm' => __('Are you sure you want to delete # {0}?', $queues->user->handlename)]) ?>
+                    <?= $this->Form->postLink(__('Delete'), ['action' => 'delete_queue', $eventer->id, $queues->id], ['confirm' => __('Are you sure you want to delete # {0}?', $queues->user->handlename)]) ?>
                 </td>
             </tr>
             <?php endforeach; ?>

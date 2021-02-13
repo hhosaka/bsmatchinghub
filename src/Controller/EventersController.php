@@ -15,7 +15,7 @@ class EventersController extends AppController
     public function isAuthorized($user = null)
     {
         $action = $this->request->getParam('action');
-        if(in_array($action,['index','view','add','delete'])){
+        if(in_array($action,['index','view','add','delete','deleteQueue','changeStatus','entry'])){
                 return true;
         }
         return parent::isAuthorized($user);
@@ -37,13 +37,6 @@ class EventersController extends AppController
         $this->set(compact('eventers','caninitiate'));
     }
 
-    /**
-     * View method
-     *
-     * @param string|null $id Eventer id.
-     * @return \Cake\Http\Response|null
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function view($id = null)
     {
         $eventer = $this->Eventers->get($id, [
@@ -51,31 +44,10 @@ class EventersController extends AppController
         ]);
 
         $user = $this->Auth->user();
-        $canentry = $user['id']!=$eventer['user_id'] && !in_array($user['id'], array_column($eventer->queues, 'user_id'));
+        $canentry = true;//$user['id']!=$eventer['user_id'] && !in_array($user['id'], array_column($eventer->queues, 'user_id'));
 
         $this->set(compact('eventer', 'canentry'));
     }
-
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
-     */
-    // public function add()
-    // {
-    //     $eventer = $this->Eventers->newEntity();
-    //     if ($this->request->is('post')) {
-    //         $eventer = $this->Eventers->patchEntity($eventer, $this->request->getData());
-    //         if ($this->Eventers->save($eventer)) {
-    //             $this->Flash->success(__('The eventer has been saved.'));
-
-    //             return $this->redirect(['action' => 'index']);
-    //         }
-    //         $this->Flash->error(__('The eventer could not be saved. Please, try again.'));
-    //     }
-    //     $users = $this->Eventers->Users->find('list', ['limit' => 200]);
-    //     $this->set(compact('eventer', 'users'));
-    // }
 
     public function add()
     {
@@ -89,38 +61,6 @@ class EventersController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
-    /**
-     * Edit method
-     *
-     * @param string|null $id Eventer id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    // public function edit($id = null)
-    // {
-    //     $eventer = $this->Eventers->get($id, [
-    //         'contain' => [],
-    //     ]);
-    //     if ($this->request->is(['patch', 'post', 'put'])) {
-    //         $eventer = $this->Eventers->patchEntity($eventer, $this->request->getData());
-    //         if ($this->Eventers->save($eventer)) {
-    //             $this->Flash->success(__('The eventer has been saved.'));
-
-    //             return $this->redirect(['action' => 'index']);
-    //         }
-    //         $this->Flash->error(__('The eventer could not be saved. Please, try again.'));
-    //     }
-    //     $users = $this->Eventers->Users->find('list', ['limit' => 200]);
-    //     $this->set(compact('eventer', 'users'));
-    // }
-
-    /**
-     * Delete method
-     *
-     * @param string|null $id Eventer id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
@@ -132,5 +72,58 @@ class EventersController extends AppController
         }
 
         return $this->redirect(['action' => 'index']);
+    }
+
+    public function entry($eventerid=null)
+    {
+        $this->loadModel('Queues');
+        $queue = $this->Queues->newEntity();
+        $queue['eventer_id'] = $eventerid;
+        $queue['user_id']=$this->Auth->user()['id'];
+        if (!$this->Queues->save($queue)) {
+            $this->Flash->error(__('The eventer could not be saved. Please, try again.'));
+        }
+        return $this->redirect(['action' => 'view', $eventerid]);
+    }
+
+    public function deleteQueue($eventerid=null, $id=null)
+    {
+        $this->loadModel('Queues');
+        $this->request->allowMethod(['post', 'delete']);
+        $queue = $this->Queues->get($id);
+        if ($this->Queues->delete($queue)) {
+            $this->Flash->success(__('The queue has been deleted.'));
+        } else {
+            $this->Flash->error(__('The queue could not be deleted. Please, try again.'));
+        }
+
+        return $this->redirect(['action' => 'view', $eventerid]);
+    }
+
+    public function changeStatus($eventerid=null, $id=null)
+    {
+        $this->loadModel('Queues');
+        $queue = $this->Queues->get($id);
+        switch($queue['status']){
+        case 'WAITING':
+            $queue['status'] = 'ONSTAGE';
+            break;
+        case 'ONSTAGE':
+            $queue['status'] = 'WIN';
+            break;
+        case 'WIN':
+            $queue['status'] = 'LOSE';
+            break;
+        case 'LOSE':
+            $queue['status'] = 'CANCEL';
+            break;
+        case 'CANCEL':
+            $queue['status'] = 'WAITING';
+            break;
+        }
+        if (!$this->Queues->save($queue)) {
+            $this->Flash->error(__('The queue could not be saved. Please, try again.'));
+        }
+        return $this->redirect(['action' => 'view', $eventerid]);
     }
 }
