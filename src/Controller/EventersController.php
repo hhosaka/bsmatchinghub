@@ -12,19 +12,17 @@ use App\Controller\AppController;
  */
 class EventersController extends AppController
 {
+    public function initialize()
+    {
+        $this->loadModel('Queues');
+        parent::initialize();
+    }
+
     public function isAuthorized($user = null)
     {
-        $action = $this->request->getParam('action');
-        if(in_array($action,['index','view','add','delete','deleteQueue','changeStatus','entry'])){
-                return true;
-        }
-        return parent::isAuthorized($user);
+        return true;
     }
-    /**
-     * Index method
-     *
-     * @return \Cake\Http\Response|null
-     */
+
     public function index()
     {
         $this->paginate = [
@@ -32,9 +30,12 @@ class EventersController extends AppController
         ];
         $eventers = $this->paginate($this->Eventers);
         $user = $this->Auth->user();
-        $caninitiate = $user['twicas_url']!='' && $this->Eventers->find('all',['conditions'=>['user_id'=>$user['id']]])->first()==null;
+        $isadmin = $user['role']=='admin';
+        $exists = $this->Eventers->find('all',['conditions'=>['user_id'=>$user['id']]])->first()!=null;
+        $caninitiate = $isadmin || ( $user['twicas_url']!='' && !$exists );
+        $candelete = $isadmin || $exists;
 
-        $this->set(compact('eventers','caninitiate'));
+        $this->set(compact('eventers','isadmin', 'caninitiate', 'candelete'));
     }
 
     public function view($id = null)
@@ -44,10 +45,12 @@ class EventersController extends AppController
         ]);
 
         $user = $this->Auth->user();
-        $canentry = true;
-//        $canentry = $user['id']!=$eventer['user_id'] && !in_array($user['id'], array_column($eventer->queues, 'user_id'));
+        $isadmin = $user['role']=='admin';
+        $exists = in_array($user['id'], array_column($eventer->queues, 'user_id'));
+        $canentry = $isadmin  || ( $user['id']!=$eventer['user_id'] &&  !$exists);
+        $candelete = $isadmin || $exists;
 
-        $this->set(compact('eventer', 'canentry'));
+        $this->set(compact('eventer', 'isadmin', 'canentry', 'candelete'));
     }
 
     public function add()
@@ -62,9 +65,14 @@ class EventersController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
+    public function deleteEventerSelf(){
+        $userid = $this->Auth->user()['id'];
+        $id = $this->Eventers->find('all',['conditions'=>['user_id'=>$userid]])->first()['id'];
+        $this->delete($id);
+    }
+
     public function delete($id = null)
     {
-        $this->request->allowMethod(['post', 'delete']);
         $eventer = $this->Eventers->get($id);
         if ($this->Eventers->delete($eventer)) {
             $this->Flash->success(__('The eventer has been deleted.'));
@@ -77,7 +85,6 @@ class EventersController extends AppController
 
     public function entry($eventerid=null)
     {
-        $this->loadModel('Queues');
         $queue = $this->Queues->newEntity();
         $queue['eventer_id'] = $eventerid;
         $queue['user_id']=$this->Auth->user()['id'];
@@ -87,10 +94,14 @@ class EventersController extends AppController
         return $this->redirect(['action' => 'view', $eventerid]);
     }
 
+    public function deleteQueueSelf($eventerid=null){
+        $userid = $this->Auth->user()['id'];
+        $id = $this->Queues->find('all',['conditions'=>['eventer_id'=>$eventerid, 'user_id'=>$userid]])->first()['id'];
+        $this->deleteQueue($eventerid, $id);
+    }
+
     public function deleteQueue($eventerid=null, $id=null)
     {
-        $this->loadModel('Queues');
-        $this->request->allowMethod(['post', 'delete']);
         $queue = $this->Queues->get($id);
         if ($this->Queues->delete($queue)) {
             $this->Flash->success(__('The queue has been deleted.'));
@@ -103,7 +114,6 @@ class EventersController extends AppController
 
     public function changeStatus($eventerid=null, $id=null)
     {
-        $this->loadModel('Queues');
         $queue = $this->Queues->get($id);
         switch($queue['status']){
         case 'WAITING':
@@ -128,9 +138,19 @@ class EventersController extends AppController
         return $this->redirect(['action' => 'view', $eventerid]);
     }
 
+    private function getSelfQueueId($eventerid){
+        $userid = $this->Auth->user()['id'];
+        return $this->Queues->find('all',['conditions'=>['eventer_id'=>$eventerid, 'user_id'=>$userid]])->first()['id'];
+    }
+
+    public function switchSelf($status=null, $eventerid=null){
+        $userid = $this->Auth->user()['id'];
+        $id = $this->Queues->find('all',['conditions'=>['eventer_id'=>$eventerid, 'user_id'=>$userid]])->first()['id'];
+        $this->switch($status, $eventerid, $this->getSelfQueueId($eventerid));
+    }
+
     public function switch($status=null, $eventerid=null, $id=null)
     {
-        $this->loadModel('Queues');
         $queue = $this->Queues->get($id);
         $queue['status'] = $status;
         if (!$this->Queues->save($queue)) {

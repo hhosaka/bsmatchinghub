@@ -8,7 +8,12 @@
     <ul class="side-nav">
         <li class="heading"><?= __('Actions') ?></li>
         <li><?= $canentry ? $this->Html->link(__('Entry'), [ 'action' => 'entry', $eventer->id]) : ''?> </li>
-        <li><?= $this->Html->link(__('Back'), [ 'action' => 'index']) ?> </li>
+        <li><?= $candelete ? $this->Html->link(__('OnStage'), [ 'action' => 'switch_self', 'ONSTAGE', $eventer->id]) : ''?> </li>
+        <li><?= $candelete ? $this->Html->link(__('Win'), [ 'action' => 'switch_self', 'WIN', $eventer->id]) : ''?> </li>
+        <li><?= $candelete ? $this->Html->link(__('Lose'), [ 'action' => 'switch_self', 'LOSE', $eventer->id]) : ''?> </li>
+        <li><?= $candelete ? $this->Html->link(__('Cancel'), [ 'action' => 'switch_self', 'CANCEL', $eventer->id]) : ''?> </li>
+        <li><?= $candelete ? $this->Html->link(__('Delete'), [ 'action' => 'delete_queue_self', $eventer->id]) : ''?> </li>
+        <li><?= $this->Html->link(__('Main Page'), [ 'action' => 'index']) ?> </li>
     </ul>
 </nav>
 <div class="eventers view large-9 medium-8 columns content">
@@ -26,13 +31,10 @@
             <?php foreach ($eventer->queues as $queues): ?>
             <tr>
                 <td><?= h($queues->user->handlename) ?></td>
-                <td><?= $this->Html->link($queues->status, [ 'action' => 'change_status', $eventer->id, $queues->id]) ?></td>
+                <td><?= $candelete ? $this->Html->link($queues->status, [ 'action' => 'change_status', $eventer->id, $queues->id]) : $queues->status ?></td>
                 <td><?= h($queues->creation_date) ?></td>
                 <td class="actions">
-                    <?= $this->Form->postLink(__('OnStage'), ['action' => 'switch', 'ONSTAGE', $eventer->id, $queues->id]) ?>
-                    <?= $this->Form->postLink(__('Win'), ['action' => 'switch', 'WIN', $eventer->id, $queues->id]) ?>
-                    <?= $this->Form->postLink(__('Lose'), ['action' => 'switch', 'LOSE', $eventer->id, $queues->id]) ?>
-                    <?= $this->Form->postLink(__('Delete'), ['action' => 'delete_queue', $eventer->id, $queues->id], ['confirm' => __('Are you sure you want to delete # {0}?', $queues->user->handlename)]) ?>
+                    <?= $isadmin ? $this->Form->postLink(__('Delete'), ['action' => 'delete_queue', $eventer->id, $queues->id], ['confirm' => __('Are you sure you want to delete # {0}?', $queues->user->handlename)]) : '***' ?>
                 </td>
             </tr>
             <?php endforeach; ?>

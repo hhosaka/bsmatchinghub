@@ -8,8 +8,9 @@
     <ul class="side-nav">
         <li class="heading"><?= __('Actions') ?></li>
         <li><?= $caninitiate ? $this->Html->link(__('Initiate'), ['action' => 'add']) : '' ?></li>
+        <li><?= $candelete ? $this->Html->link(__('Delete'), ['action' => 'delete_eventer_self']) : '' ?></li>
         <li><?= $this->Html->link(__('Settings'), ['controller' => 'Users', 'action' => 'settings']) ?></li>
-        <li><?= $this->Html->link(__('Logout'), ['controller' => 'Users', 'action' => 'logout'], ['confirm' => __('You may keep login. Are you sure you want to logout?')]) ?></li>
+        <li><?= $isadmin ? $this->Html->link(__('Logout'), ['controller' => 'Users', 'action' => 'logout'], ['confirm' => __('You may keep login. Are you sure you want to logout?')]) : '' ?></li>
     </ul>
 </nav>
 <div class="eventers index large-9 medium-8 columns content">
@@ -35,7 +36,7 @@
                 <td><?= count(array_keys(array_column($eventer->queues,'status'),'LOSE'))?></td>
                 <td class="actions">
                     <?= $this->Html->link('Visit', $eventer->user->twicas_url)?>
-                    <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $eventer->id], ['confirm' => __('Are you sure you want to delete # {0}?', $eventer->user->handlename)]) ?>
+                    <?= $isadmin ? $this->Form->postLink(__('Delete'), ['action' => 'delete', $eventer->id], ['confirm' => __('Are you sure you want to delete # {0}?', $eventer->user->handlename)]) : '' ?>
                 </td>
             </tr>
             <?php endforeach; ?>

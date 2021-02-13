@@ -401,17 +401,17 @@ class UsersController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
             $user = $this->Users->patchEntity($user, $data);
-            $user['keyword'] = $this->packKeyword($data);
+//            $user['keyword'] = $this->packKeyword($data);
             if ($this->Users->save($user)) {
                 $this->Flash->success(__('The user has been saved.'));
-
+                $this->Auth->setUser($user);
                 return $this->redirect(['controller'=>'Eventers', 'action' => 'index']);
             }
             $this->Flash->error(__('The user could not be saved. Please, try again.'));
         }
 
-        $this->set('keywords', $this->keywordlist);
-        $this->set('data',$this->unpackKeywords($user['keyword']));
+//        $this->set('keywords', $this->keywordlist);
+//        $this->set('data',$this->unpackKeywords($user['keyword']));
         $this->set(compact('user'));
     }
 
