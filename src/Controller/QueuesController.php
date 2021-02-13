@@ -145,6 +145,9 @@ class QueuesController extends AppController
             $queue['status'] = 'LOSE';
             break;
         case 'LOSE':
+            $queue['status'] = 'CANCEL';
+            break;
+        case 'CANCEL':
             $queue['status'] = 'WAITING';
             break;
         }

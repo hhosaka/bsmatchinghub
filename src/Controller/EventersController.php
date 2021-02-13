@@ -50,7 +50,10 @@ class EventersController extends AppController
             'contain' => ['Users', 'Queues'=>['Users']],
         ]);
 
-        $this->set('eventer', $eventer);
+        $user = $this->Auth->user();
+        $canentry = $user['id']!=$eventer['user_id'] && !in_array($user['id'], array_column($eventer->queues, 'user_id'));
+
+        $this->set(compact('eventer', 'canentry'));
     }
 
     /**

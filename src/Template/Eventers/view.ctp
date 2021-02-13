@@ -7,14 +7,14 @@
 <nav class="large-3 medium-4 columns" id="actions-sidebar">
     <ul class="side-nav">
         <li class="heading"><?= __('Actions') ?></li>
-        <li><?= $this->Html->link(__('Entry'), ['controller'=>'Queues', 'action' => 'entry', $eventer->id]) ?> </li>
+        <li><?= $canentry ? $this->Html->link(__('Entry'), ['controller'=>'Queues', 'action' => 'entry', $eventer->id]) : ''?> </li>
         <li><?= $this->Html->link(__('Back'), [ 'action' => 'index']) ?> </li>
     </ul>
 </nav>
 <div class="eventers view large-9 medium-8 columns content">
-    <h3><?= h($eventer->user->handlename) ?></h3>
+    <h3><?= $this->Html->link(h($eventer->user->handlename), $eventer->user->twicas_url)?></h3>
     <div class="related">
-        <h4><?= __('対戦待ち行列') ?></h4>
+        <h4><?= __('Waiting Queue') ?></h4>
         <?php if (!empty($eventer->queues)): ?>
         <table cellpadding="0" cellspacing="0">
             <tr>
