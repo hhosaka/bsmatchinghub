@@ -44,7 +44,8 @@ class EventersController extends AppController
         ]);
 
         $user = $this->Auth->user();
-        $canentry = true;//$user['id']!=$eventer['user_id'] && !in_array($user['id'], array_column($eventer->queues, 'user_id'));
+        $canentry = true;
+//        $canentry = $user['id']!=$eventer['user_id'] && !in_array($user['id'], array_column($eventer->queues, 'user_id'));
 
         $this->set(compact('eventer', 'canentry'));
     }
@@ -121,6 +122,17 @@ class EventersController extends AppController
             $queue['status'] = 'WAITING';
             break;
         }
+        if (!$this->Queues->save($queue)) {
+            $this->Flash->error(__('The queue could not be saved. Please, try again.'));
+        }
+        return $this->redirect(['action' => 'view', $eventerid]);
+    }
+
+    public function switch($status=null, $eventerid=null, $id=null)
+    {
+        $this->loadModel('Queues');
+        $queue = $this->Queues->get($id);
+        $queue['status'] = $status;
         if (!$this->Queues->save($queue)) {
             $this->Flash->error(__('The queue could not be saved. Please, try again.'));
         }

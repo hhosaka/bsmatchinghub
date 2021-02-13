@@ -18,10 +18,10 @@
         <thead>
             <tr>
                 <th scope="col"><?= $this->Paginator->sort('TwitCasting Owner') ?></th>
-                <th scope="col" width='10%'><?= $this->Paginator->sort('Waiting') ?></th>
-                <th scope="col" width='10%'><?= $this->Paginator->sort('OnStage') ?></th>
-                <th scope="col" width='10%'><?= $this->Paginator->sort('Win') ?></th>
-                <th scope="col" width='10%'><?= $this->Paginator->sort('Lose') ?></th>
+                <th scope="col" width='7%'><?= $this->Paginator->sort('Waiting') ?></th>
+                <th scope="col" width='7%'><?= $this->Paginator->sort('OnStage') ?></th>
+                <th scope="col" width='7%'><?= $this->Paginator->sort('Win') ?></th>
+                <th scope="col" width='7%'><?= $this->Paginator->sort('Lose') ?></th>
                 <th scope="col" width='10%' class="actions"><?= __('Actions') ?></th>
             </tr>
         </thead>

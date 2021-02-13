@@ -21,7 +21,7 @@
                 <th scope="col"><?= __('User') ?></th>
                 <th scope="col" width ="15%"><?= __('Status') ?></th>
                 <th scope="col" width ="15%"><?= __('Creation Date') ?></th>
-                <th scope="col" width ="15%" class="actions"><?= __('Actions') ?></th>
+                <th scope="col" width ="20%" class="actions"><?= __('Actions') ?></th>
             </tr>
             <?php foreach ($eventer->queues as $queues): ?>
             <tr>
@@ -29,6 +29,9 @@
                 <td><?= $this->Html->link($queues->status, [ 'action' => 'change_status', $eventer->id, $queues->id]) ?></td>
                 <td><?= h($queues->creation_date) ?></td>
                 <td class="actions">
+                    <?= $this->Form->postLink(__('OnStage'), ['action' => 'switch', 'ONSTAGE', $eventer->id, $queues->id]) ?>
+                    <?= $this->Form->postLink(__('Win'), ['action' => 'switch', 'WIN', $eventer->id, $queues->id]) ?>
+                    <?= $this->Form->postLink(__('Lose'), ['action' => 'switch', 'LOSE', $eventer->id, $queues->id]) ?>
                     <?= $this->Form->postLink(__('Delete'), ['action' => 'delete_queue', $eventer->id, $queues->id], ['confirm' => __('Are you sure you want to delete # {0}?', $queues->user->handlename)]) ?>
                 </td>
             </tr>
