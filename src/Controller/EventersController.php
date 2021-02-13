@@ -46,11 +46,11 @@ class EventersController extends AppController
 
         $user = $this->Auth->user();
         $isadmin = $user['role']=='admin';
+        $userid = $user['id'];
         $exists = in_array($user['id'], array_column($eventer->queues, 'user_id'));
         $canentry = $isadmin  || ( $user['id']!=$eventer['user_id'] &&  !$exists);
-        $candelete = $isadmin || $exists;
 
-        $this->set(compact('eventer', 'isadmin', 'canentry', 'candelete'));
+        $this->set(compact('eventer', 'isadmin', 'canentry', 'exists','userid'));
     }
 
     public function add()
