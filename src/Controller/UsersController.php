@@ -468,6 +468,7 @@ class UsersController extends AppController
         $user = $this->Users->get($id);
         if ($this->Users->delete($user)) {
             $this->Flash->success(__('The user has been deleted.'));
+            $this->logout();
         } else {
             $this->Flash->error(__('The user could not be deleted. Please, try again.'));
         }
